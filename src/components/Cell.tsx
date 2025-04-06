@@ -1,29 +1,28 @@
-interface CellProps {
-  boardIndex: number;
-  cellIndex: number;
-  value: string;
-  onPress: (boardIndex: number, cellIndex: number) => void;
-  disabled: boolean;
-  boardSize: number;
-}
+import type { CellProps } from '../services/types';
 
-const Cell = ({ boardIndex, cellIndex, value, onPress, disabled, boardSize }: CellProps) => {
-  const screenWidth = window.innerWidth;
-  const cellSize = (screenWidth * 0.9) / boardSize - 10;
-
+const Cell: React.FC<CellProps> = ({ boardIndex, cellIndex, value, onPress, disabled }) => {
   return (
     <button
       onClick={() => onPress(boardIndex, cellIndex)}
       disabled={disabled || !!value}
-      className="bg-black border border-gray-300 m-1 flex items-center justify-center"
-      style={{ width: cellSize, height: cellSize }}
+      className={`
+        relative border border-gray-300 flex items-center justify-center
+        ${disabled ? 'bg-gray-800' : 'bg-black hover:bg-gray-900'}
+        aspect-square
+      `}
     >
-      <span
-        className="text-red-600 font-pixelvt"
-        style={{ fontSize: cellSize * 0.4 }}
-      >
-        {value}
-      </span>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span
+          className="text-red-600 font-[pixelvt]"
+          style={{
+            fontSize: `clamp(12px, 4vw, 32px)`,
+            lineHeight: 1,
+            filter: 'drop-shadow(0 0 2px rgba(255,0,0,0.5))'
+          }}
+        >
+          {value}
+        </span>
+      </div>
     </button>
   );
 };

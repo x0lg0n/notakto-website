@@ -177,11 +177,11 @@ function App() {
     setShowWinnerModal(false);
   };
 
-  const handleBoardConfigChange = (num: number, size: BoardSize) => {
+  const handleBoardConfigChange = (num: number, size: number) => {
     setNumberOfBoards(Math.min(5, Math.max(1, num)));
-    setBoardSize(size);
+    setBoardSize(size as BoardSize);
     setShowBoardConfig(false);
-    resetGame(num, size);
+    resetGame(num, size as BoardSize);
   };
 
   const handleUndo = () => {
@@ -300,7 +300,7 @@ function App() {
           visible={showBoardConfig}
           currentBoards={numberOfBoards}
           currentSize={boardSize}
-          onConfirm={(num, size) => handleBoardConfigChange(num, size as BoardSize)}
+          onConfirm={handleBoardConfigChange}
           onCancel={() => setShowBoardConfig(false)}
         />
         <DifficultyModal
@@ -313,12 +313,11 @@ function App() {
           onClose={() => setShowDifficultyModal(false)}
         />
       </div>
+
     </>
   )
 }
 
 export default App;
-
-
 
 

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Board from './Board';
 import LiveMode from './LiveMode';
 import { GameProps } from '../services/types';
-const PAY_URL="https://curious-comfortable-puck.glitch.me";
+
+const PAY_URL = "https://curious-comfortable-puck.glitch.me";
 
 const Game: React.FC<GameProps> = (props) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -59,7 +60,7 @@ const Game: React.FC<GameProps> = (props) => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-black">
+    <div className="flex flex-col min-h-screen bg-black relative">
       <div className="flex-1">
         <div className="flex flex-col items-center px-6 py-4 -mb-8">
           {props.gameMode === 'vsComputer' && (
@@ -71,78 +72,111 @@ const Game: React.FC<GameProps> = (props) => {
           <h2 className="text-red-600 text-[80px] font-[pixelvt] mb-5 text-center">{props.currentPlayer}</h2>
         </div>
 
-        <div className="flex flex-wrap justify-center pb-5">
+        <div className="flex flex-wrap justify-center gap-4 p-4 w-full">
           {props.boards.map((board, index) => (
-            <Board
-              key={index}
-              boardIndex={index}
-              boardState={board}
-              makeMove={props.makeMove}
-              isDead={props.isBoardDead(board)}
-              boardSize={props.boardSize}
-            />
+            <div key={index} className="w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.3%-1.5rem)]" style={{ maxWidth: '400px' }}>
+              <Board
+                boardIndex={index}
+                boardState={board}
+                makeMove={props.makeMove}
+                isDead={props.isBoardDead(board)}
+                boardSize={props.boardSize}
+              />
+            </div>
           ))}
         </div>
 
-        <div className="relative bottom-0 left-0 right-0 flex justify-center items-center bg-blue-600 px-6 py-4">
+        <div className="relative bottom-0 left-0 right-0 flex justify-center items-center bg-blue-600 px-6 py-2">
           <button onClick={toggleMenu} className="text-white text-[35px] font-[pixelfont]">Settings</button>
         </div>
-
-        {isMenuOpen && (
-          <div className="absolute inset-0 bg-black bg-opacity-60 z-50">
-            <div className="w-full h-full" onClick={toggleMenu}></div>
-            <div className="p-4 absolute inset-0 flex flex-col items-center gap-2 z-50">
-              <button onClick={props.onBoardConfigPress} className="w-full bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">Game Configuration</button>
-
-              {props.gameMode === 'vsPlayer' && (
-                <button onClick={props.onResetNames} className="w-full bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">Reset Names</button>
-              )}
-
-              {props.gameMode === 'vsComputer' && (
-                <>
-                  <button
-                    onClick={props.onUndo}
-                    disabled={!props.canUndo}
-                    className={`w-full py-4 text-white text-[30px] font-[pixelvt] ${!props.canUndo ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
-                  >
-                    Undo (100 coins)
-                  </button>
-                  <button
-                    onClick={props.onSkip}
-                    disabled={!props.canSkip}
-                    className={`w-full py-4 text-white text-[30px] font-[pixelvt] ${!props.canSkip ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
-                  >
-                    Skip a Move (200 coins)
-                  </button>
-                  <button
-                    onClick={handleBuyCoins}
-                    disabled={isProcessingPayment}
-                    className={`w-full flex justify-center items-center gap-2 py-4 text-white text-[30px] font-[pixelvt] ${isProcessingPayment ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
-                  >
-                    {isProcessingPayment && <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />}
-                    {isProcessingPayment ? 'Processing...' : 'Buy Coins (100)'}
-                  </button>
-                </>
-              )}
-
-              <button onClick={props.resetGame} className="w-full bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">Reset</button>
-
-              {props.gameMode === 'vsComputer' && (
-                <button onClick={props.onDifficultyPress!} className="w-full bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
-                  AI Level: {props.difficulty}
-                </button>
-              )}
-
-              <button onClick={props.toggleMute} className="w-full bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
-                Sound: {props.isMuted ? 'Off' : 'On'}
-              </button>
-
-              <button onClick={props.exitToMenu} className="w-full bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">Main Menu</button>
-              <button onClick={toggleMenu} className="w-full bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">Return to Game</button>
-            </div>
-          </div>
-        )}
       </div>
+
+      {isMenuOpen && (
+        <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999] flex items-center justify-center px-4 overflow-y-auto">
+          <div className="flex flex-wrap justify-center gap-4 max-w-4xl py-8">
+            <button onClick={() => {
+              props.onBoardConfigPress!();
+              setIsMenuOpen(false);
+            }
+            } className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
+              Game Configuration
+            </button>
+
+            {props.gameMode === 'vsPlayer' && (
+              <button onClick={() => {
+                props.onResetNames!();
+                setIsMenuOpen(false);
+              }} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
+                Reset Names
+              </button>
+            )}
+
+            {props.gameMode === 'vsComputer' && (
+              <>
+                <button
+                  onClick={()=>{
+                    props.onUndo!();
+                    setIsMenuOpen(false);
+                  }}
+                  disabled={!props.canUndo}
+                  className={`w-full sm:w-[45%] py-4 text-white text-[30px] font-[pixelvt] ${!props.canUndo ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
+                >
+                  Undo (100 coins)
+                </button>
+                <button
+                  onClick={()=>{
+                    props.onSkip!();
+                    setIsMenuOpen(false);
+                  }}
+                  disabled={!props.canSkip}
+                  className={`w-full sm:w-[45%] py-4 text-white text-[30px] font-[pixelvt] ${!props.canSkip ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
+                >
+                  Skip a Move (200 coins)
+                </button>
+                <button
+                  onClick={handleBuyCoins}
+                  disabled={isProcessingPayment}
+                  className={`w-full sm:w-[45%] flex justify-center items-center gap-2 py-4 text-white text-[30px] font-[pixelvt] ${isProcessingPayment ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
+                >
+                  {isProcessingPayment && <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />}
+                  {isProcessingPayment ? 'Processing...' : 'Buy Coins (100)'}
+                </button>
+              </>
+            )}
+
+            <button onClick={() => {
+              props.resetGame!();
+              setIsMenuOpen(false);
+            }
+            } className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
+              Reset
+            </button>
+
+            {props.gameMode === 'vsComputer' && (
+              <button onClick={() => {
+                props.onDifficultyPress!();
+                setIsMenuOpen(false);
+              }}
+                className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]"
+              >
+                AI Level: {props.difficulty}
+              </button>
+            )}
+
+            <button onClick={props.toggleMute} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
+              Sound: {props.isMuted ? 'Off' : 'On'}
+            </button>
+
+            <button onClick={props.exitToMenu} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
+              Main Menu
+            </button>
+
+            <button onClick={toggleMenu} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
+              Return to Game
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
