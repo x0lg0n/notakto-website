@@ -72,7 +72,7 @@ const Game: React.FC<GameProps> = (props) => {
           <h2 className="text-red-600 text-[80px] font-[pixelvt] mb-5 text-center">{props.currentPlayer}</h2>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-4 p-4 w-full">
+        <div className="flex flex-wrap justify-center gap-4 p-4 w-full mb-20">
           {props.boards.map((board, index) => (
             <div key={index} className="w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.3%-1.5rem)]" style={{ maxWidth: '400px' }}>
               <Board
@@ -86,7 +86,7 @@ const Game: React.FC<GameProps> = (props) => {
           ))}
         </div>
 
-        <div className="relative bottom-0 left-0 right-0 flex justify-center items-center bg-blue-600 px-6 py-2">
+        <div className="absolute bottom-0 left-0 right-0 flex justify-center items-center bg-blue-600 px-6 py-2 mt-2">
           <button onClick={toggleMenu} className="text-white text-[35px] font-[pixelfont]">Settings</button>
         </div>
       </div>
