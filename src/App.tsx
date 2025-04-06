@@ -14,8 +14,8 @@ import DifficultyModal from './components/modals/DifficultyModal';
 import { findBestMove } from './services/ai';
 import { calculateRewards } from './services/economyUtils';
 import type { BoardState, GameMode, DifficultyLevel, BoardSize } from './services/types';
-//import { playMoveSound, playWinSound } from './services/sounds';
 import { useCoins, useXP } from './services/store';
+import { playMoveSound, playWinSound, initBackgroundMusic, toggleBackgroundMusic, stopBackgroundMusic } from './services/sounds';
 
 // Firebase module
 import { signInWithGoogle, signOutUser, onAuthStateChangedListener, saveEconomyToFirestore, loadEconomyFromFirestore } from './services/firebase';
@@ -66,7 +66,18 @@ function App() {
     };
     loadData();
   }, []);
-
+  useEffect(() => {
+    initBackgroundMusic(mute);
+  
+    return () => {
+      stopBackgroundMusic();
+    };
+  }, []);
+  
+  useEffect(() => {
+    toggleBackgroundMusic(mute);
+  }, [mute]);
+  
   // Reset game when board configuration changes
   useEffect(() => {
     resetGame(numberOfBoards, boardSize);
@@ -143,6 +154,7 @@ function App() {
         ...board.slice(cellIndex + 1)
       ] : [...board]
     );
+    playMoveSound(mute);
     setBoards(newBoards);
     setGameHistory([...gameHistory, newBoards]);
 
@@ -163,6 +175,7 @@ function App() {
       const winnerName = winner === 1 ? player1Name : player2Name;
       setWinner(winnerName);
       setShowWinnerModal(true);
+      playWinSound(mute);
       return;
     }
 
