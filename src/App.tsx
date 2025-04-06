@@ -31,7 +31,7 @@ function App() {
   const [showBoardConfig, setShowBoardConfig] = useState(false);
   const [difficulty, setDifficulty] = useState<DifficultyLevel>(1);
   const [showDifficultyModal, setShowDifficultyModal] = useState<boolean>(false);
-  const [mute, setMute] = useState<boolean>(false);
+  const [mute, setMute] = useState<boolean>(true);
 
   // Economy State
   const { coins, setCoins } = useCoins();
@@ -284,6 +284,8 @@ function App() {
             signIn={handleSignIn}
             signOut={handleSignOut}
             signed={!!user}
+            isMuted={mute}
+            toggleMute={() => setMute(!mute)}
           />
         )}
 

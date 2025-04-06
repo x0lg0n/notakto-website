@@ -1,6 +1,6 @@
 import { MenuProps } from "../services/types";
 
-const Menu = ({ startGame, showTutorial, signed, signIn, signOut }: MenuProps) => {
+const Menu = ({ startGame, showTutorial, signed, signIn, signOut, toggleMute, isMuted }: MenuProps) => {
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
       <div className="flex flex-col items-center gap-6 w-full max-w-md px-4">
@@ -31,6 +31,9 @@ const Menu = ({ startGame, showTutorial, signed, signIn, signOut }: MenuProps) =
             Sign In
           </button>
         )}
+        <button onClick={toggleMute} className="w-full bg-blue-600 py-4 text-white text-[30px]">
+          Sound: {isMuted ? 'Off' : 'On'}
+        </button>
       </div>
     </div>
   );

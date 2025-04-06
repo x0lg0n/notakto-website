@@ -9,6 +9,8 @@ export type MenuProps = {
   signed: boolean;
   signIn: () => void;
   signOut: () => void;
+  toggleMute: ()=> void;
+  isMuted: boolean;
 };
 export type LiveProps = {
   onClose: () => void;
