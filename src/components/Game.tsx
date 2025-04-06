@@ -65,11 +65,11 @@ const Game: React.FC<GameProps> = (props) => {
         <div className="flex flex-col items-center px-6 py-4 -mb-8">
           {props.gameMode === 'vsComputer' && (
             <div className="flex flex-row justify-center items-center -mt-2">
-              <span className="text-red-600 text-[35px] font-[pixelvt]">Coins: {props.coins}</span>
-              <span className="text-red-600 text-[35px] font-[pixelvt]"> | XP: {props.experience}</span>
+              <span className="text-red-600 text-[35px] ">Coins: {props.coins}</span>
+              <span className="text-red-600 text-[35px] "> | XP: {props.experience}</span>
             </div>
           )}
-          <h2 className="text-red-600 text-[80px] font-[pixelvt] mb-5 text-center">{props.currentPlayer}</h2>
+          <h2 className="text-red-600 text-[80px] mb-5 text-center">{props.currentPlayer}</h2>
         </div>
 
         <div className="flex flex-wrap justify-center gap-4 p-4 w-full mb-20">
@@ -87,7 +87,7 @@ const Game: React.FC<GameProps> = (props) => {
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 flex justify-center items-center bg-blue-600 px-6 py-2 mt-2">
-          <button onClick={toggleMenu} className="text-white text-[35px] font-[pixelfont]">Settings</button>
+          <button onClick={toggleMenu} className="text-white text-[35px]">Settings</button>
         </div>
       </div>
 
@@ -98,7 +98,7 @@ const Game: React.FC<GameProps> = (props) => {
               props.onBoardConfigPress!();
               setIsMenuOpen(false);
             }
-            } className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
+            } className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
               Game Configuration
             </button>
 
@@ -106,7 +106,7 @@ const Game: React.FC<GameProps> = (props) => {
               <button onClick={() => {
                 props.onResetNames!();
                 setIsMenuOpen(false);
-              }} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
+              }} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
                 Reset Names
               </button>
             )}
@@ -119,7 +119,7 @@ const Game: React.FC<GameProps> = (props) => {
                     setIsMenuOpen(false);
                   }}
                   disabled={!props.canUndo}
-                  className={`w-full sm:w-[45%] py-4 text-white text-[30px] font-[pixelvt] ${!props.canUndo ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
+                  className={`w-full sm:w-[45%] py-4 text-white text-[30px] ${!props.canUndo ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
                 >
                   Undo (100 coins)
                 </button>
@@ -129,14 +129,14 @@ const Game: React.FC<GameProps> = (props) => {
                     setIsMenuOpen(false);
                   }}
                   disabled={!props.canSkip}
-                  className={`w-full sm:w-[45%] py-4 text-white text-[30px] font-[pixelvt] ${!props.canSkip ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
+                  className={`w-full sm:w-[45%] py-4 text-white text-[30px] ${!props.canSkip ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
                 >
                   Skip a Move (200 coins)
                 </button>
                 <button
                   onClick={handleBuyCoins}
                   disabled={isProcessingPayment}
-                  className={`w-full sm:w-[45%] flex justify-center items-center gap-2 py-4 text-white text-[30px] font-[pixelvt] ${isProcessingPayment ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
+                  className={`w-full sm:w-[45%] flex justify-center items-center gap-2 py-4 text-white text-[30px] ${isProcessingPayment ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
                 >
                   {isProcessingPayment && <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />}
                   {isProcessingPayment ? 'Processing...' : 'Buy Coins (100)'}
@@ -148,7 +148,7 @@ const Game: React.FC<GameProps> = (props) => {
               props.resetGame!();
               setIsMenuOpen(false);
             }
-            } className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
+            } className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
               Reset
             </button>
 
@@ -157,21 +157,21 @@ const Game: React.FC<GameProps> = (props) => {
                 props.onDifficultyPress!();
                 setIsMenuOpen(false);
               }}
-                className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]"
+                className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]"
               >
                 AI Level: {props.difficulty}
               </button>
             )}
 
-            <button onClick={props.toggleMute} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
+            <button onClick={props.toggleMute} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
               Sound: {props.isMuted ? 'Off' : 'On'}
             </button>
 
-            <button onClick={props.exitToMenu} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
+            <button onClick={props.exitToMenu} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
               Main Menu
             </button>
 
-            <button onClick={toggleMenu} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px] font-[pixelvt]">
+            <button onClick={toggleMenu} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
               Return to Game
             </button>
           </div>

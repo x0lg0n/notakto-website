@@ -1,7 +1,4 @@
-interface TutorialModalProps {
-  visible: boolean;
-  onClose: () => void;
-}
+import { TutorialModalProps } from "../../services/types";
 
 const TutorialModal = ({ visible, onClose }: TutorialModalProps) => {
   if (!visible) return null;
@@ -9,11 +6,11 @@ const TutorialModal = ({ visible, onClose }: TutorialModalProps) => {
   return (
     <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
       <div className="bg-blue-600 p-6 w-[80%] max-w-md shadow-xl">
-        <h2 className="text-3xl font-pixelfont text-red-600 text-center mb-4">
+        <h2 className="text-3xl text-red-600 text-center mb-4">
           How&nbsp;&nbsp;&nbsp;to&nbsp;&nbsp;&nbsp;Play Notakto
         </h2>
 
-        <p className="text-white text-lg font-pixelvt leading-6 mb-6 whitespace-pre-line">
+        <p className="text-white text-lg leading-6 mb-6 whitespace-pre-line">
           • Both players use X marks{'\n'}
           • Game is played on three 3x3 boards{'\n'}
           • Players alternate placing Xs{'\n'}
@@ -24,7 +21,7 @@ const TutorialModal = ({ visible, onClose }: TutorialModalProps) => {
 
         <button
           onClick={onClose}
-          className="bg-red-600 text-white text-xl font-pixelfont px-6 py-3 rounded text-center w-full"
+          className="bg-red-600 text-white text-xl px-6 py-3 rounded text-center w-full"
         >
           Close&nbsp;&nbsp;&nbsp;Tutorial
         </button>

@@ -56,7 +56,7 @@ const LiveMode = ({ onClose }: LiveProps) => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-black">
       {gameState === "playing" ? (
         <>
-          <h1 className="text-5xl font-pixelvt text-red-600 mb-6">
+          <h1 className="text-5xl text-red-600 mb-6">
             {isMyTurn ? "Your Turn" : "Opponent's Turn"}
           </h1>
           <div className="flex flex-wrap justify-center gap-12 pb-10">
@@ -72,7 +72,7 @@ const LiveMode = ({ onClose }: LiveProps) => {
                     disabled={!isMyTurn || board.blocked || cell !== ""}
                     className="w-1/3 h-1/3 border border-gray-300 flex items-center justify-center bg-black"
                   >
-                    <span className="text-[100px] font-pixelvt text-red-600">{cell}</span>
+                    <span className="text-[100px] text-red-600">{cell}</span>
                   </button>
                 ))}
               </div>
@@ -82,11 +82,11 @@ const LiveMode = ({ onClose }: LiveProps) => {
       ) : (
         <div className="flex flex-col items-center gap-5">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-white text-2xl font-pixelvt">Searching for opponent...</p>
+          <p className="text-white text-2xl ">Searching for opponent...</p>
         </div>
       )}
       <div className="w-full bg-red-600 py-3 text-center mt-auto">
-        <button onClick={onClose} className="text-white text-2xl font-pixelfont">Leave</button>
+        <button onClick={onClose} className="text-white text-2xl ">Leave</button>
       </div>
     </div>
   );
