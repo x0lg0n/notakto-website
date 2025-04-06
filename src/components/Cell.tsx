@@ -13,7 +13,7 @@ const Cell: React.FC<CellProps> = ({ boardIndex, cellIndex, value, onPress, disa
     >
       <div className="absolute inset-0 flex items-center justify-center">
         <span
-          className="text-red-600"
+          className="text-red-600 text-5xl"
           style={{
             lineHeight: 1,
             filter: 'drop-shadow(0 0 2px rgba(255,0,0,0.5))'
