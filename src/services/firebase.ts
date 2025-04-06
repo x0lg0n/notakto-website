@@ -79,7 +79,7 @@ export const saveEconomyToFirestore = async (
 // -------------------
 export const loadEconomyFromFirestore = async (
   userId: string
-): Promise<object | null> => {
+) => {
   const userRef = doc(firestore, 'users', userId);
   const docSnap = await getDoc(userRef);
   if (docSnap.exists()) {

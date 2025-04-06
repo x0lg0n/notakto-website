@@ -32,6 +32,7 @@ function App() {
   const [difficulty, setDifficulty] = useState<DifficultyLevel>(1);
   const [showDifficultyModal, setShowDifficultyModal] = useState<boolean>(false);
   const [mute, setMute] = useState<boolean>(true);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   // Economy State
   const { coins, setCoins } = useCoins();
@@ -50,22 +51,6 @@ function App() {
   // Auth user
   const [user, setUser] = useState<any>(null);
 
-  // Load economy data and initialize game
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setCoins(1000);
-        setXP(0);
-        resetGame(numberOfBoards, boardSize);
-      } catch (error) {
-        console.error('Failed to load data:', error);
-        setCoins(1000);
-        setXP(0);
-        resetGame(numberOfBoards, boardSize);
-      }
-    };
-    loadData();
-  }, []);
   useEffect(() => {
     initBackgroundMusic(mute);
   
@@ -83,35 +68,35 @@ function App() {
     resetGame(numberOfBoards, boardSize);
   }, [numberOfBoards, boardSize]);
 
-  // Subscribe to Firebase Auth state changes
+
   useEffect(() => {
     const unsubscribe = onAuthStateChangedListener(async (usr) => {
       setUser(usr);
       if (usr) {
-        const cloudData = await loadEconomyFromFirestore(usr.uid) as { coins?: number; experience?: number } | null;
+        const cloudData = await loadEconomyFromFirestore(usr.uid) as { coins?: number; XP?: number };
         if (cloudData) {
           setCoins(cloudData.coins ?? 1000);
-          setXP(cloudData.experience ?? 0);
+          setXP(cloudData.XP ?? 0);
         } else {
           setCoins(1000);
           setXP(0);
         }
+        setDataLoaded(true); // Mark data as loaded
       } else {
         setCoins(1000);
         setXP(0);
+        setDataLoaded(false); // Reset when user signs out
       }
     });
-  
     return () => unsubscribe();
   }, []);
   
-
-  // Save economy data locally and to Firestore if signed in
+  // Save economy data only if data is loaded and user is signed in
   useEffect(() => {
-    if (user) {
+    if (user && dataLoaded) {
       saveEconomyToFirestore(user.uid, coins, XP);
     }
-  }, [coins, XP, user]);
+  }, [coins, XP, user, dataLoaded]);
 
   // AI Move Handler
   useEffect(() => {
