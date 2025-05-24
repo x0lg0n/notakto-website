@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react';
 import Board from './Board';
 import LiveMode from './LiveMode';

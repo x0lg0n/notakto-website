@@ -1,4 +1,4 @@
-import './App.css'
+'use client'
 import { useState, useEffect } from 'react';
 
 // Components
