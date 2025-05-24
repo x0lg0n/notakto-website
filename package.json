@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.7",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "firebase": "^11.8.1",
     "next": "^15.3.2",
     "postcss": "^8.5.3",
