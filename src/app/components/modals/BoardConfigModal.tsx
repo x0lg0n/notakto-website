@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react';
-import { BoardConfigModalProps } from '../../services/types';
+import { BoardConfigModalProps } from '../../../services/types';
 
 const BoardConfigModal = ({
   visible,

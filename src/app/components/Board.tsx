@@ -1,5 +1,5 @@
 import Cell from './Cell';
-import type { BoardProps } from '../services/types';
+import type { BoardProps } from '../../services/types';
 
 const Board: React.FC<BoardProps> = ({ boardIndex, boardState, makeMove, isDead, boardSize }) => {
   return (

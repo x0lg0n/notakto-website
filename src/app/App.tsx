@@ -11,14 +11,14 @@ import BoardConfigModal from './components/modals/BoardConfigModal';
 import DifficultyModal from './components/modals/DifficultyModal';
 
 // Services, styles, etc.
-import { findBestMove } from './services/ai';
-import { calculateRewards } from './services/economyUtils';
-import type { BoardState, GameMode, DifficultyLevel, BoardSize } from './services/types';
-import { useCoins, useXP } from './services/store';
-import { playMoveSound, playWinSound, initBackgroundMusic, toggleBackgroundMusic, stopBackgroundMusic } from './services/sounds';
+import { findBestMove } from '../services/ai';
+import { calculateRewards } from '../services/economyUtils';
+import type { BoardState, GameMode, DifficultyLevel, BoardSize } from '../services/types';
+import { useCoins, useXP } from '../services/store';
+import { playMoveSound, playWinSound, initBackgroundMusic, toggleBackgroundMusic, stopBackgroundMusic } from '../services/sounds';
 
 // Firebase module
-import { signInWithGoogle, signOutUser, onAuthStateChangedListener, saveEconomyToFirestore, loadEconomyFromFirestore } from './services/firebase';
+import { signInWithGoogle, signOutUser, onAuthStateChangedListener, saveEconomyToFirestore, loadEconomyFromFirestore } from '../services/firebase';
 
 function App() {
   // Game State
