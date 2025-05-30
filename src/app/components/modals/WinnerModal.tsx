@@ -1,4 +1,4 @@
-import { WinnerModalProps } from "../../services/types";
+import { WinnerModalProps } from "../../../services/types";
 
 const WinnerModal = ({ visible, winner, onPlayAgain, onMenu }: WinnerModalProps) => {
   if (!visible) return null;

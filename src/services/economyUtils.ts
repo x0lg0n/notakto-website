@@ -1,4 +1,4 @@
-import { BoardSize, DifficultyLevel } from '../services/types';
+import { BoardSize, DifficultyLevel } from './types';
 
 
 

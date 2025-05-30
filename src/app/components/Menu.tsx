@@ -1,4 +1,4 @@
-import { MenuProps } from "../services/types";
+import { MenuProps } from "../../services/types";
 
 const Menu = ({ startGame, showTutorial, signed, signIn, signOut, toggleMute, isMuted }: MenuProps) => {
   return (

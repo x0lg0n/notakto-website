@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Board from './Board';
 import LiveMode from './LiveMode';
-import { GameProps } from '../services/types';
+import { GameProps } from '../../services/types';
 
 const PAY_URL = "https://curious-comfortable-puck.glitch.me";
 

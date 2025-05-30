@@ -1,5 +1,5 @@
-import {isBoardDead} from '../src/app/services/ai'
-import type { BoardState } from '../src/app/services/types';
+import {isBoardDead} from '../src/services/ai'
+import type { BoardState } from '../src/services/types';
 
 
 describe('isBoardDead', () => {

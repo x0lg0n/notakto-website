@@ -1,4 +1,4 @@
-import { TutorialModalProps } from "../../services/types";
+import { TutorialModalProps } from "../../../services/types";
 
 const TutorialModal = ({ visible, onClose }: TutorialModalProps) => {
   if (!visible) return null;

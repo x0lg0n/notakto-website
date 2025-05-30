@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react';
-import { PlayerNamesModalProps } from '../../services/types';
+import { PlayerNamesModalProps } from '../../../services/types';
 
 
 const PlayerNamesModal = ({ visible, onSubmit, initialNames }: PlayerNamesModalProps) => {
