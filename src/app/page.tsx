@@ -43,16 +43,16 @@ export default function Home() {
       if (usr) {
         const cloudData = await loadEconomyFromFirestore(usr.uid) as { coins?: number; XP?: number };
         if (cloudData) {
+          console.log(1);
           setCoins(cloudData.coins ?? 1000);
           setXP(cloudData.XP ?? 0);
         } else {
+          console.log(2);
           setCoins(1000);
           setXP(0);
         }
         dataLoadedRef.current = true;
       } else {
-        setCoins(1000);
-        setXP(0);
         dataLoadedRef.current = false;
       }
     });
