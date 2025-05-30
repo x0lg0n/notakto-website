@@ -1,13 +1,6 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-type CoinStore = {
-    coins: number;
-    setCoins: (newCoins: number) => void;
-  };
-type XPStore = {
-    XP: number;
-    setXP: (newXP: number) => void;
-  };
 type userStore = {
   user: any;
   setUser: (newUser: any) => void;
@@ -20,19 +13,38 @@ type tutStore = {
     showTut: boolean;
     setShowTut: (newShowTut: boolean) => void;
   };
+type CoinStore = {
+  coins: number;
+  setCoins: (newCoins: number) => void;
+};
+type XPStore = {
+  XP: number;
+  setXP: (newXP: number) => void;
+};
 
+export const useCoins = create<CoinStore>()(
+  persist(
+    (set) => ({
+      coins: 1000,
+      setCoins: (newCoins: number) => set({ coins: newCoins }),
+    }),
+    {
+      name: 'coins-storage', // key in localStorage
+    }
+  )
+);
 
-
-
-
-export const useCoins = create<CoinStore>((set) => ({
-  coins: 1000,
-  setCoins: (newCoins: number) => set({ coins: newCoins }),
-}))
-export const useXP = create<XPStore>((set) => ({
-  XP: 0,
-  setXP: (newXP: number) => set({ XP: newXP }),
-}))
+export const useXP = create<XPStore>()(
+  persist(
+    (set) => ({
+      XP: 0,
+      setXP: (newXP: number) => set({ XP: newXP }),
+    }),
+    {
+      name: 'xp-storage', // key in localStorage
+    }
+  )
+);
 export const useUser = create<userStore>((set) => ({
   user: null,
   setUser: (newUser) => set({ user: newUser }),
