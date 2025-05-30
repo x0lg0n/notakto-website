@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { signInWithGoogle, signOutUser } from '@/services/firebase';
 
 import { useCoins, useXP, useUser, useMute, useTut } from '@/services/store';
-import TutorialModal from './components/modals/TutorialModal';
+import TutorialModal from '../modals/TutorialModal';
 
 const Menu = () => {
   const setCoins = useCoins((state) => state.setCoins);
