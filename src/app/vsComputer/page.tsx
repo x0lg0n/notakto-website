@@ -1,16 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import Board from '../components/Board';
+import Board from './Board';
 import { BoardSize, BoardState, DifficultyLevel } from '@/services/types';
 import { isBoardDead } from '@/services/logic';
 import { playMoveSound, playWinSound } from '@/services/sounds';
 import { useMute } from '@/services/store';
 import { useRouter } from 'next/navigation';
-import WinnerModal from '../components/modals/WinnerModal';
-import BoardConfigModal from '../components/modals/BoardConfigModal';
+import WinnerModal from '../../modals/WinnerModal';
+import BoardConfigModal from '../../modals/BoardConfigModal';
 import { useCoins, useXP } from '@/services/store';
-import DifficultyModal from '../components/modals/DifficultyModal';
+import DifficultyModal from '../../modals/DifficultyModal';
 import { findBestMove } from '@/services/ai';
 import { calculateRewards } from '@/services/economyUtils';
 

@@ -1,4 +1,4 @@
-import { DifficultyModalProps } from "../../../services/types";
+import { DifficultyModalProps } from "../services/types";
 
 const DifficultyModal = ({ visible, onSelect, onClose }: DifficultyModalProps) => {
   if (!visible) return null;
