@@ -14,7 +14,6 @@ import DifficultyModal from '../../modals/DifficultyModal';
 import { findBestMove } from '@/services/ai';
 import { calculateRewards } from '@/services/economyUtils';
 
-const PAY_URL = "https://curious-comfortable-puck.glitch.me";
 
 const Game = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -39,7 +38,7 @@ const Game = () => {
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
     const makeMove = (boardIndex: number, cellIndex: number) => {
-        if (boards[boardIndex][cellIndex] !== '' || isBoardDead(boards[boardIndex],boardSize)) return;
+        if (boards[boardIndex][cellIndex] !== '' || isBoardDead(boards[boardIndex], boardSize)) return;
 
         const newBoards = boards.map((board, idx) =>
             idx === boardIndex ? [
@@ -55,16 +54,16 @@ const Game = () => {
         if (newBoards.every(board => isBoardDead(board, boardSize))) {
             const loser = currentPlayer;
             const winner = loser === 1 ? 2 : 1;
-            const isHumanWinner = winner===1;
+            const isHumanWinner = winner === 1;
             const rewards = calculateRewards(isHumanWinner, difficulty, numberOfBoards, boardSize);
 
             if (isHumanWinner) {
                 setCoins(Coins + rewards.coins);
                 setXP(XP + rewards.xp);
-            }else {
+            } else {
                 setXP(Math.round(XP + rewards.xp * 0.25));
             }
-            const winnerName = winner === 1 ? "You": "Computer";
+            const winnerName = winner === 1 ? "You" : "Computer";
             setWinner(winnerName);
             setShowWinnerModal(true);
             playWinSound(mute);
@@ -108,33 +107,96 @@ const Game = () => {
             console.log('Insufficient Coins', 'You need at least 200 coins to skip a move!');
         }
     };
-    const handleBuyCoins = async () => {
+    const handleBuyCoins = async (): Promise<void> => {
         setIsProcessingPayment(true);
+
         try {
-            const response = await fetch(`${PAY_URL}/create-payment`, {
+            const response = await fetch('/api/create-payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    amount: '1.00',
-                    currency: 'INR',
-                    customerId: 'user_123',
-                    customerName: 'Test User',
-                }),
+                    amount: "1.00",
+                    currency: "INR",
+                    customerId: "user_123",
+                    customerName: "Test User"
+                })
             });
 
             const data = await response.json();
+
             if (data.success) {
-                window.open(data.paymentUrl, '_blank');
-                checkPaymentStatus(data.chargeId);
+                const paymentWindow = window.open(data.paymentUrl, '_blank');
+
+                if (!paymentWindow) {
+                    alert('Popup blocked. Please allow popups and try again.');
+                    return;
+                }
+
+                // Start polling for payment status
+                checkPaymentStatus(
+                    data.chargeId,
+                    paymentWindow,
+                    () => {
+                        alert('✅ Payment successful! 100 coins added to your account.');
+                        setCoins(Coins+100);
+                    },
+                    (reason) => {
+                        alert(`❌ ${reason}`);
+                    }
+                );
             } else {
-                alert('Payment Failed: Could not initiate payment. Please try again.');
+                alert('Payment failed: Could not initiate payment');
             }
         } catch (error) {
-            alert('Error: Payment processing failed.');
+            console.error(error);
+            alert('Payment processing failed');
         } finally {
             setIsProcessingPayment(false);
         }
     };
+
+    const checkPaymentStatus = async (
+        chargeId: string,
+        paymentWindow: Window | null,
+        onSuccess: () => void,
+        onFailure: (reason: string) => void
+    ): Promise<void> => {
+        const intervalId = setInterval(async () => {
+            if (paymentWindow?.closed) {
+                clearInterval(intervalId);
+                onFailure("Payment was manually cancelled.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/order-status/${chargeId}`);
+                const data = await response.json();
+
+                if (data.status === 'paid' || data.status === 'confirmed') {
+                    clearInterval(intervalId);
+                    paymentWindow?.close();
+                    onSuccess();
+                } else if (data.status === 'expired' || data.status === 'canceled') {
+                    clearInterval(intervalId);
+                    paymentWindow?.close();
+                    onFailure("Payment expired or failed.");
+                }
+            } catch (err) {
+                console.error("Failed to check payment status:", err);
+            }
+        }, 3000);
+    };
+
+
+
+    const router = useRouter();
+    const exitToMenu = () => {
+        router.push('/');
+    }
+
+    useEffect(() => {
+        resetGame(numberOfBoards, boardSize);
+    }, []);
     // AI Move Handler
     useEffect(() => {
         if (currentPlayer === 2) {
@@ -151,33 +213,6 @@ const Game = () => {
             return () => clearTimeout(timeout);
         }
     }, [currentPlayer, boards, difficulty, boardSize, numberOfBoards]);
-
-
-
-    const checkPaymentStatus = async (orderId: string) => {
-        try {
-            const response = await fetch(`${PAY_URL}/order-status/${orderId}`);
-            const data = await response.json();
-
-            if (data.status === 'paid') {
-                alert('Success! 100 coins added to your account!');
-                setCoins(Coins + 100);
-            } else {
-                setTimeout(() => checkPaymentStatus(orderId), 5000);
-            }
-        } catch (error) {
-            alert('Error verifying payment status.');
-        }
-    };
-
-    const router = useRouter();
-    const exitToMenu = () => {
-        router.push('/');
-    }
-
-    useEffect(() => {
-        resetGame(numberOfBoards, boardSize);
-    }, []);
 
     return (
         <div className="flex flex-col min-h-screen bg-black relative">
