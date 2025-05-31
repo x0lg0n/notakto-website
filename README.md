@@ -12,12 +12,6 @@ This turns classic Tic-Tac-Toe into a **zero-sum, strategic game** — it's esse
 
 ---
 
-## 🎮 Your Notakto Project Features
-
-You’ve made a robust, full-featured implementation of Notakto using **Next.js** (after migrating from React Native). Here’s a complete list of features and technical details:
-
----
-
 ### ⚙️ Game Mechanics
 
 * **Misère Rule Logic** – Completing the last three-in-a-row results in a loss.
