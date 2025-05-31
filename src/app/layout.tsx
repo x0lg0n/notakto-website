@@ -13,9 +13,10 @@ export const metadata: Metadata = {
 };
 
 const vt323 = VT323({
-  weight: "400"
+  weight: "400",
+  subsets: ["latin"],
 })
- 
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,8 +26,8 @@ export default function RootLayout({
     <html lang="en" className={vt323.className}>
       <body>
         {children}
-        <Analytics/>
-        <SpeedInsights/>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
