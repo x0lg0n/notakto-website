@@ -42,6 +42,8 @@ export default function RootLayout({
           name="google-site-verification"
           content="lxHtpLX2cDKFEAAabqQ3-9IY-ckiw3KvqM3Z1kNPxRo"
         />
+        <meta name="monetag" content="31cbc3974b21341db36f756db33d15d6"></meta>
+        {/* <script type='text/javascript' src='//pl26839258.profitableratecpm.com/0f/06/04/0f0604d55debc71786156cded96c3374.js'></script> */}
       </head>
       <body>
         {children}
