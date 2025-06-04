@@ -43,6 +43,7 @@ export default function RootLayout({
           content="lxHtpLX2cDKFEAAabqQ3-9IY-ckiw3KvqM3Z1kNPxRo"
         />
         <meta name="monetag" content="31cbc3974b21341db36f756db33d15d6"></meta>
+        <script src="https://fpyf8.com/88/tag.min.js" data-zone="150762" async data-cfasync="false"></script>
         {/* <script type='text/javascript' src='//pl26839258.profitableratecpm.com/0f/06/04/0f0604d55debc71786156cded96c3374.js'></script> */}
       </head>
       <body>
