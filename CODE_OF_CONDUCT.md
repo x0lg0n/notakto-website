@@ -28,10 +28,13 @@ Examples of unacceptable behavior include:
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the maintainer at [rakshitg600@gmail.com]. All
+reported by contacting the maintainer at [rakshitg600@gmail.com][1]. All
 complaints will be reviewed and investigated and will result in a response
 that is deemed necessary and appropriate.
 
 ---
 
-This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org), version 2.1.
+This Code of Conduct is adapted from the [Contributor Covenant][2], version 2.1.
+
+[1]: mailto:rakshitg600@gmail.com
+[2]: https://www.contributor-covenant.org

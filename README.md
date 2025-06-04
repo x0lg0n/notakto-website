@@ -14,8 +14,8 @@
 
 In this implementation of notakto:
 
-* You can play on one to five boards
-* Boards can have between 2x2 and 5x5 cells
+* You can play on one to five boards.
+* Boards can have between 2x2 and 5x5 cells.
 * The player that completes a row, a column, or the diagonal _loses_ that board.
 * Boards with a complete row, column, or diagonal are inactivated—they become a "dead" board.
 
