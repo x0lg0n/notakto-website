@@ -106,7 +106,7 @@ To create a pull request:
     git commit -m 'Add my new feature'
     ```
 
-1. Push to the branch.
+1. Push the branch to your forked repository.
 
     ```console
     git push -u origin feature/MyNewFeature
