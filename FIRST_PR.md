@@ -92,7 +92,7 @@ Congratulations, you've made your first contribution!
 
 Don’t worry if anything seems confusing as you're getting started. If you're stuck on something, just ask!
 
-[!NOTE]
+> [!NOTE]
 > We **don't** expect you to understand everything perfectly. In fact, your questions help us improve the project.
 
 You’re always welcome to:
