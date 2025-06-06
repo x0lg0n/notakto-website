@@ -87,7 +87,8 @@ export function updateBoards(
 export function findBestMove(
   boards: BoardState[],
   difficulty: DifficultyLevel, // 1 (dumb) … 5 (perfect)
-  boardSize: BoardSize
+  boardSize: BoardSize,
+  _numberOfBoards: number
 ): { boardIndex: number; cellIndex: number } | null {
   const moves = getValidMoves(boards, boardSize);
   if (moves.length === 0) return null;
