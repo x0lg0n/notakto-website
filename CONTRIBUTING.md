@@ -100,18 +100,13 @@ Check the [issues](https://github.com/rakshitg600/notakto-website/issues) tab an
 
 ---
 
-## 🐳 Docker (WIP)
+## 🐳 Docker 
 
-We're adding Docker support!
+To run the application using Docker, use the following command:
 
-Steps:
-
-1. Dockerize the Next.js frontend
-2. Use `docker-compose` to include both frontend and socket server
-3. Update `CONTRIBUTING.md` and related docs
-
-Track progress: [#DOCKERIZE](https://github.com/Rakshitg600/notakto-website/issues/13)
-
+```bash
+docker-compose up
+```
 ---
 
 ## 🙋 We're Happy to Help
