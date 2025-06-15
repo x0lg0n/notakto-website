@@ -1,9 +1,14 @@
+# Project structure
+
+The project's `src` folder contains the following modules:
+
+```text
 src/
 ├── app/
 │   ├── api/
 │   │   ├── create-payment/
 │   │   │   └── route.ts
-│   │   └── order-status \[id]/
+│   │   └── order-status/[id]/
 │   │       └── route.ts
 │   ├── liveMatch/
 │   │   └── page.tsx
@@ -33,3 +38,4 @@ src/
     ├── sounds.ts
     ├── store.ts
     └── types.ts
+```
