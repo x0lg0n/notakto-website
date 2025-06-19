@@ -40,8 +40,13 @@ const Menu = () => {
   };
 
   const startGame = (mode: string) => {
+    if (mode === 'liveMatch' && !user) {
+      alert('Please sign in to play Live Match!');
+      return;
+    }
     router.push(`/${mode}`);
   };
+
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
