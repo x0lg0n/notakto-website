@@ -40,12 +40,13 @@ const Menu = () => {
   };
 
   const startGame = (mode: string) => {
-    if (mode === 'liveMatch' && !user) {
-      alert('Please sign in to play Live Match!');
+    if ((mode === 'liveMatch' || mode === 'vsComputer') && !user) {
+      alert('Please sign in!');
       return;
     }
     router.push(`/${mode}`);
   };
+
 
 
   return (
