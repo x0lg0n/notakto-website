@@ -2,15 +2,16 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
+import clsx from "clsx";
 
 const SERVER_URL = "https://deciduous-incongruous-herring.glitch.me";
 const socket = io(SERVER_URL);
 
 const LiveMode = () => {
-    const router=useRouter();
-    const onClose=()=>{
-        router.push('/');
-    }
+  const router = useRouter();
+  const onClose = () => {
+    router.push('/');
+  }
   const [boards, setBoards] = useState(
     Array(3)
       .fill('')
@@ -77,7 +78,10 @@ const LiveMode = () => {
               {boards.map((board, boardIndex) => (
                 <div
                   key={boardIndex}
-                  className={`w-[300px] h-[300px] flex flex-wrap bg-black ${board.blocked ? "opacity-50" : ""}`}
+                  className={clsx(
+                    "w-[300px] h-[300px] flex flex-wrap bg-black",
+                    board.blocked && "opacity-50"
+                  )}
                 >
                   {board.grid.map((cell, cellIndex) => (
                     <button
