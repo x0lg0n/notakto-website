@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { CellProps } from '../../services/types';
 
 const Cell: React.FC<CellProps> = ({ boardIndex, cellIndex, value, onPress, disabled }) => {
@@ -5,11 +6,10 @@ const Cell: React.FC<CellProps> = ({ boardIndex, cellIndex, value, onPress, disa
     <button
       onClick={() => onPress(boardIndex, cellIndex)}
       disabled={disabled || !!value}
-      className={`
-        relative border border-gray-300 flex items-center justify-center
-        ${disabled ? 'bg-gray-800' : 'bg-black hover:bg-gray-900'}
-        aspect-square
-      `}
+      className={clsx(
+        "relative border border-gray-300  flex items-center justify-center aspect-square",
+        disabled ? 'bg-gray-800' : 'bg-black hover:bg-gray-900'
+      )}
     >
       <div className="absolute inset-0 flex items-center justify-center">
         <span

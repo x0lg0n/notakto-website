@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react';
 import { BoardConfigModalProps } from '../services/types';
+import clsx from 'clsx';
 
 const BoardConfigModal = ({
   visible,
@@ -23,9 +24,9 @@ const BoardConfigModal = ({
             <button
               key={num}
               onClick={() => setSelectedBoards(num)}
-              className={`min-w-[60px] px-4 py-2 text-white text-xl ${
+              className={clsx("min-w-[60px] px-4 py-2 text-white text-xl",
                 selectedBoards === num ? 'bg-red-600' : 'bg-blue-600'
-              }`}
+              )}
             >
               {num}
             </button>
@@ -38,9 +39,9 @@ const BoardConfigModal = ({
             <button
               key={size}
               onClick={() => setSelectedSize(size)}
-              className={`min-w-[60px] px-4 py-2 text-white text-xl ${
+              className={clsx("min-w-[60px] px-4 py-2 text-white text-xl",
                 selectedSize === size ? 'bg-red-600' : 'bg-blue-600'
-              }`}
+              )}
             >
               {size}x{size}
             </button>
