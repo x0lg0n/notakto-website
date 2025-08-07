@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react';
 import { PlayerNamesModalProps } from '../services/types';
-import { toast } from "react-toastify";
+import { toast } from "react-toastify"; // Imports toast from Toastify
 
 
 const PlayerNamesModal = ({ visible, onSubmit, initialNames = ['Player 1', 'Player 2'] }: PlayerNamesModalProps) => {
@@ -15,8 +15,7 @@ const PlayerNamesModal = ({ visible, onSubmit, initialNames = ['Player 1', 'Play
 
   const handleSubmit = () => {
     if (player1.trim().toLowerCase() === player2.trim().toLowerCase()) {
-      toast("Player 1 and Player 2 cannot have the same name.")
-      // alert("Player 1 and Player 2 cannot have the same name.");
+      toast("Player 1 and Player 2 cannot have the same name.") // sends a toast message
       return;
     }
     onSubmit(player1 || 'Player 1', player2 || 'Player 2');
