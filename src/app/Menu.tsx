@@ -6,6 +6,8 @@ import { signInWithGoogle, signOutUser } from '@/services/firebase';
 import { useCoins, useXP, useUser, useMute, useTut } from '@/services/store';
 import TutorialModal from '../modals/TutorialModal';
 
+import { toast } from "react-toastify";
+
 const Menu = () => {
   const setCoins = useCoins((state) => state.setCoins);
   const setXP = useXP((state) => state.setXP);
@@ -41,7 +43,8 @@ const Menu = () => {
 
   const startGame = (mode: string) => {
     if ((mode === 'liveMatch' || mode === 'vsComputer') && !user) {
-      alert('Please sign in!');
+      // alert('Please sign in!');
+      toast("Please sign in!")
       return;
     }
     router.push(`/${mode}`);

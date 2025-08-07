@@ -13,6 +13,7 @@ import { useCoins, useXP } from '@/services/store';
 import DifficultyModal from '../../modals/DifficultyModal';
 import { findBestMove } from '@/services/ai';
 import { calculateRewards } from '@/services/economyUtils';
+import { toast } from "react-toastify";
 
 
 const Game = () => {
@@ -128,7 +129,8 @@ const Game = () => {
                 const paymentWindow = window.open(data.paymentUrl, '_blank');
 
                 if (!paymentWindow) {
-                    alert('Popup blocked. Please allow popups and try again.');
+                    toast('Popup blocked. Please allow popups and try again.')
+                    // alert('Popup blocked. Please allow popups and try again.');
                     return;
                 }
 
@@ -137,19 +139,28 @@ const Game = () => {
                     data.chargeId,
                     paymentWindow,
                     () => {
-                        alert('✅ Payment successful! 100 coins added to your account.');
-                        setCoins(Coins+100);
+                        toast('✅ Payment successful! 100 coins added to your account.')
+
+                        // alert('✅ Payment successful! 100 coins added to your account.');
+                        setCoins(Coins + 100);
                     },
                     (reason) => {
-                        alert(`❌ ${reason}`);
+                        toast(`❌ ${reason}`)
+
+                        // alert(`❌ ${reason}`);
+
                     }
                 );
             } else {
-                alert('Payment failed: Could not initiate payment');
+                toast("Payment failed: Could not initiate payment")
+
+                // alert('Payment failed: Could not initiate payment');
             }
         } catch (error) {
-            console.error(error);
-            alert('Payment processing failed');
+            // console.error(errofvvr);
+            toast("Payment processing failed")
+
+            // alert('Payment processing failed');
         } finally {
             setIsProcessingPayment(false);
         }
