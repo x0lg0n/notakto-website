@@ -1,0 +1,9 @@
+# Allow all web crawlers
+User-agent: *
+Allow: /
+
+# Block crawlers from API routes
+Disallow: /api/
+
+# Point crawlers to your sitemap for better indexing
+Sitemap: https://notakto-website.vercel.app/sitemap.ts
