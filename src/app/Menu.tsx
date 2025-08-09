@@ -6,7 +6,8 @@ import { signInWithGoogle, signOutUser } from '@/services/firebase';
 import { useCoins, useXP, useUser, useMute, useTut } from '@/services/store';
 import TutorialModal from '../modals/TutorialModal';
 
-import { toast } from "react-toastify"; // Imports toast from Toastify
+import { toast } from "react-toastify";
+import { useRef } from "react"; // For cooldown tracking
 
 const Menu = () => {
   const setCoins = useCoins((state) => state.setCoins);
@@ -21,6 +22,10 @@ const Menu = () => {
   const setShowTut = useTut((state) => state.setShowTut);
 
   const router = useRouter();
+
+  // Store the last time the toast was shown
+  const lastToastTimeRef = useRef(0);
+  const toastCooldown = 4500; // 4.5 seconds
 
   const handleSignIn = async () => {
     try {
@@ -43,13 +48,15 @@ const Menu = () => {
 
   const startGame = (mode: string) => {
     if ((mode === 'liveMatch' || mode === 'vsComputer') && !user) {
-      toast("Please sign in!") // sends a toast message
+      const now = Date.now();
+      if (now - lastToastTimeRef.current >= toastCooldown) {
+        toast("Please sign in!");
+        lastToastTimeRef.current = now;
+      }
       return;
     }
     router.push(`/${mode}`);
   };
-
-
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">

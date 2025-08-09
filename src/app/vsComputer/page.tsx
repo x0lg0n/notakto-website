@@ -150,7 +150,6 @@ const Game = () => {
                 toast("Payment failed: Could not initiate payment") // sends a toast message
             }
         } catch (error) {
-            // console.error(errofvvr);
             toast("Payment processing failed") // sends a toast message
         } finally {
             setIsProcessingPayment(false);
