@@ -152,6 +152,15 @@ To create a pull request:
 
 A reviewer reviews your pull request. If they approve the request, they merge your changes into the project's `main` branch.
 
+## :Contributors
+Thanks to these amazing people for contributing to **Notakto**:
+
+<a href="https://github.com/Rakshitg600/notakto-website/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Rakshitg600/notakto-website" />
+</a>
+
+> This image is generated using [contrib.rocks](https://contrib.rocks)
+
 To learn more about contributing to this project, see the [Contributing guide][14].
 
 ## :balance_scale: License
