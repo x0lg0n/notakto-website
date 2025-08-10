@@ -6,7 +6,7 @@
 [![Issues][issues-shield]][issues-url]
 [![Unlicense License][license-shield]][license-url]
 
-## :Contributors
+
 Thanks to these amazing people for contributing to **Notakto**:
 
 <a href="https://github.com/Rakshitg600/notakto-website/graphs/contributors">
