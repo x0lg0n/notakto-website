@@ -159,7 +159,6 @@ Thanks to these amazing people for contributing to **Notakto**:
   <img src="https://contrib.rocks/image?repo=Rakshitg600/notakto-website" />
 </a>
 
-> This image is generated using [contrib.rocks](https://contrib.rocks)
 
 To learn more about contributing to this project, see the [Contributing guide][14].
 
