@@ -6,6 +6,13 @@
 [![Issues][issues-shield]][issues-url]
 [![Unlicense License][license-shield]][license-url]
 
+## :Contributors
+Thanks to these amazing people for contributing to **Notakto**:
+
+<a href="https://github.com/Rakshitg600/notakto-website/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Rakshitg600/notakto-website" />
+</a>
+
 ## :question: What's Notakto?
 
 **Notakto** is a [**misère and impartial form of tic-tac-toe**][1]. Also known as reverse tic-tac-toe, this variant turns the normal rules of tic-tac-toe on their head. It uses [misère rules][3], which means if you line up three marks in a row, you _lose_. And it's impartial, so both players use **X** and play on one to more grids, or boards. This turns tic-tac-toe into a **strategic zero-sum game**—like [**misère Nim**][2].
@@ -152,12 +159,7 @@ To create a pull request:
 
 A reviewer reviews your pull request. If they approve the request, they merge your changes into the project's `main` branch.
 
-## :Contributors
-Thanks to these amazing people for contributing to **Notakto**:
 
-<a href="https://github.com/Rakshitg600/notakto-website/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Rakshitg600/notakto-website" />
-</a>
 
 
 To learn more about contributing to this project, see the [Contributing guide][14].
