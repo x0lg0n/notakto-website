@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Notakto Team" }],
   creator: "Notakto Team",
 };
-
+const toastCooldown = 4500;
 const vt323 = VT323({
   weight: "400",
   subsets: ["latin"],
@@ -47,7 +47,7 @@ export default function RootLayout({
       </head>
       <body>
         {children}
-        <CustomToastContainer />
+        <CustomToastContainer autoClose={toastCooldown}/>
         <Analytics />
         <SpeedInsights />
       </body>

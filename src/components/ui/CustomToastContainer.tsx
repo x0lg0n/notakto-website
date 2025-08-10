@@ -10,7 +10,7 @@ const vt323 = VT323({
 });
 
 
-export function CustomToastContainer() {
+export function CustomToastContainer({ autoClose = 4000 }: { autoClose?: number }) {
     return (
         <ToastContainer
             position="top-center"   // shows toast at top-center ... many other options have available
