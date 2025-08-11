@@ -21,7 +21,7 @@ const PlayerNamesModal = ({ visible, onSubmit, initialNames = ['Player 1', 'Play
     lastClickTimeRef.current = now;
 
     if (player1.trim().toLowerCase() === player2.trim().toLowerCase()) {
-      toast("Player 1 and Player 2 cannot have the same name.");
+      toast("Player 1 and Player 2 cannot have the same name.",{autoClose: 4500});
       return;
     }
     onSubmit(player1 || 'Player 1', player2 || 'Player 2');

@@ -7,7 +7,7 @@ import { useCoins, useXP, useUser, useMute, useTut } from '@/services/store';
 import TutorialModal from '../modals/TutorialModal';
 
 import { toast } from "react-toastify";
-import { useRef } from "react"; // For cooldown tracking
+import { useRef } from "react";
 
 const Menu = () => {
   const setCoins = useCoins((state) => state.setCoins);
@@ -50,7 +50,7 @@ const Menu = () => {
     if ((mode === 'liveMatch' || mode === 'vsComputer') && !user) {
       const now = Date.now();
       if (now - lastToastTimeRef.current >= toastCooldown) {
-        toast("Please sign in!");
+        toast("Please sign in!",{ autoClose: 10000 });
         lastToastTimeRef.current = now;
       }
       return;

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
-import { toast } from "react-toastify"; // Imports toast from Toastify
+import { toast } from "react-toastify";
 
 const SERVER_URL = "https://deciduous-incongruous-herring.glitch.me";
 const socket = io(SERVER_URL);
@@ -38,12 +38,12 @@ const LiveMode = () => {
     });
 
     socket.on("gameOver", (data: { loser: string }) => {
-      toast(data.loser === socket.id ? "You Lost!" : "You Won!"); // sends a toast message
+      toast(data.loser === socket.id ? "You Lost!" : "You Won!",{autoClose:4500}); 
       resetGame();
     });
 
     socket.on("opponentDisconnected", () => {
-      toast("Opponent Disconnected! Searching for new match..."); // sends a toast message
+      toast("Opponent Disconnected! Searching for new match...", {autoClose: 4500});
       resetGame();
     });
 
