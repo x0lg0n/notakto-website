@@ -3,7 +3,6 @@
 import { ToastContainer, ToastContainerProps, CloseButton } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { VT323 } from "next/font/google";
-import { XCircle } from "lucide-react"; // X ICON
 
 const vt323 = VT323({
     weight: "400",
@@ -40,10 +39,10 @@ export function CustomToastContainer({
             closeButton={(props) => (       // Close (X) button to manually close the toast
                 <button
                     onClick={props.closeToast}
-                    className={`absolute top-1 right-1 text-white hover:text-slate-200`}
+                    className={`absolute top-1 flex items-center justify-center right-1 h-[25px] w-[25px] text-white ${vt323.className} border-1 rounded-full hover:text-slate-200`}
                     aria-label="close"
                 >
-                    <XCircle size={22} strokeWidth={2} />
+                    X
                 </button>
             )}
             toastClassName={toastClassName || (() =>
