@@ -2,27 +2,23 @@
 
 import { useRouter } from 'next/navigation';
 import { signInWithGoogle, signOutUser } from '@/services/firebase';
-
 import { useCoins, useXP, useUser, useMute, useTut } from '@/services/store';
 import TutorialModal from '../modals/TutorialModal';
-
 import { toast } from "react-toastify";
 import { useToastCooldown } from "@/components/hooks/useToastCooldown";
+import { MenuButton } from '@/components/ui/MenuButton';
 
 const Menu = () => {
   const setCoins = useCoins((state) => state.setCoins);
   const setXP = useXP((state) => state.setXP);
-
   const user = useUser((state) => state.user);
   const setUser = useUser((state) => state.setUser);
-
   const mute = useMute((state) => state.mute);
   const setMute = useMute((state) => state.setMute);
   const showTut = useTut((state) => state.showTut);
   const setShowTut = useTut((state) => state.setShowTut);
 
   const router = useRouter();
-
   const { canShowToast, triggerToastCooldown, resetCooldown } = useToastCooldown(4000);
 
   const handleSignIn = async () => {
@@ -63,35 +59,21 @@ const Menu = () => {
       <div className="flex flex-col items-center gap-6 w-full max-w-md px-4">
         <h1 className="text-white text-[80px]">Notakto</h1>
 
-        <button onClick={() => startGame('vsPlayer')} className="w-full bg-blue-600 py-4 text-white text-2xl ">
-          Play vs Player
-        </button>
-
-        <button onClick={() => startGame('vsComputer')} className="w-full bg-blue-600 py-4 text-white text-2xl ">
-          Play vs Computer
-        </button>
-
-        <button onClick={() => startGame('liveMatch')} className="w-full bg-blue-600 py-4 text-white text-2xl ">
-          Live Match
-        </button>
-
-        <button onClick={() => setShowTut(true)} className="w-full bg-blue-600 py-4 text-white text-2xl ">
-          Tutorial
-        </button>
+        <MenuButton onClick={() => startGame('vsPlayer')}> Play vs Player </MenuButton>
+        <MenuButton onClick={() => startGame('vsComputer')}> Play vs Computer </MenuButton>
+        <MenuButton onClick={() => startGame('liveMatch')}> Live Match </MenuButton>
+        <MenuButton onClick={() => setShowTut(true)}> Tutorial </MenuButton>
 
         {user ? (
-          <button onClick={handleSignOut} className="w-full bg-blue-600 py-4 text-white text-2xl ">
-            Sign Out
-          </button>
+          <MenuButton onClick={handleSignOut}> Sign Out </MenuButton>
         ) : (
-          <button onClick={handleSignIn} className="w-full bg-blue-600 py-4 text-white text-2xl">
-            Sign In
-          </button>
+          <MenuButton onClick={handleSignIn}> Sign In </MenuButton>
         )}
 
-        <button onClick={() => setMute(!mute)} className="w-full bg-blue-600 py-4 text-white text-[30px]">
+        <MenuButton onClick={() => setMute(!mute)} className="text-[30px]">
           Sound: {mute ? 'Off' : 'On'}
-        </button>
+        </MenuButton>
+
         {showTut && <TutorialModal />}
       </div>
     </div>
