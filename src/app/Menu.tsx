@@ -56,24 +56,14 @@ const Menu = () => {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
-      <div className="flex flex-col items-center gap-6 w-full max-w-md px-4">
-        <h1 className="text-white text-[80px]">Notakto</h1>
-
+      <div className="flex flex-col items-center gap-4 w-full max-w-md px-4">
+        <h1 className="text-red-600 text-[180px] -mb-10">Notakto</h1>
         <MenuButton onClick={() => startGame('vsPlayer')}> Play vs Player </MenuButton>
         <MenuButton onClick={() => startGame('vsComputer')}> Play vs Computer </MenuButton>
         <MenuButton onClick={() => startGame('liveMatch')}> Live Match </MenuButton>
         <MenuButton onClick={() => setShowTut(true)}> Tutorial </MenuButton>
-
-        {user ? (
-          <MenuButton onClick={handleSignOut}> Sign Out </MenuButton>
-        ) : (
-          <MenuButton onClick={handleSignIn}> Sign In </MenuButton>
-        )}
-
-        <MenuButton onClick={() => setMute(!mute)} className="text-[30px]">
-          Sound: {mute ? 'Off' : 'On'}
-        </MenuButton>
-
+        <MenuButton onClick={(user)?handleSignOut:handleSignIn}> {(user)?"Sign Out":"Sign in"} </MenuButton>
+        <MenuButton onClick={() => setMute(!mute)}>Sound: {mute ? 'Off' : 'On'}</MenuButton>
         {showTut && <TutorialModal />}
       </div>
     </div>
