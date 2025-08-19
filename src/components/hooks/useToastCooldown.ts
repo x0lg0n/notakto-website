@@ -1,7 +1,7 @@
 import { useRef, useCallback } from "react";
 
 export function useToastCooldown(cooldown: number = 4000) {
-  const cooldownTimer = useRef<NodeJS.Timeout | null>(null);
+  const cooldownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isOnCooldown = useRef(false);
 
   const canShowToast = useCallback(() => !isOnCooldown.current, []);
