@@ -1,6 +1,6 @@
 'use client';
 
-import { ToastContainer, ToastContainerProps } from 'react-toastify';
+import { ToastContainer, ToastContainerProps, CloseButton } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { VT323 } from "next/font/google";
 
@@ -34,9 +34,17 @@ export function CustomToastContainer({
             newestOnTop={newestOnTop}     // older toasts stay on top
             closeOnClick={closeOnClick}    // Closes the toast on click
             pauseOnFocusLoss={pauseOnFocusLoss} // cool down time pauses when tab or window is switched
-            draggable={draggable}        // toast can be dragged
+            draggable={draggable}           // toast can be dragged
             pauseOnHover={pauseOnHover}     // The Toast Notification pauses on hover
-            closeButton={closeButton}     // Close (X) button to manually close the toast
+            closeButton={(props) => (       // Close (X) button to manually close the toast
+                <button
+                    onClick={props.closeToast}
+                    className={`absolute top-1 right-3 text-white ${vt323.className} hover:text-slate-300`}
+                    aria-label="close"
+                >
+                    X
+                </button>
+            )}
             toastClassName={toastClassName || (() =>
                 `${vt323.className} relative text-[22px] text-center w-[300px] bg-black text-white font-mono border border-blue-500 rounded-md px-4 py-3 shadow-[0_0_12px_#00ffff] tracking-wider mb-3`
             )}
