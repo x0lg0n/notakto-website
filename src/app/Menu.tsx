@@ -7,7 +7,7 @@ import { useCoins, useXP, useUser, useMute, useTut } from '@/services/store';
 import TutorialModal from '../modals/TutorialModal';
 
 import { toast } from "react-toastify";
-import { useRef } from "react";
+import { useToastCooldown } from "@/components/hooks/useToastCooldown";
 
 const Menu = () => {
   const setCoins = useCoins((state) => state.setCoins);
@@ -23,9 +23,7 @@ const Menu = () => {
 
   const router = useRouter();
 
-  // Store the last time the toast was shown
-  const lastToastTimeRef = useRef(0);
-  const toastCooldown = 4500; // 4.5 seconds
+  const { canShowToast, triggerToastCooldown, resetCooldown } = useToastCooldown(4000);
 
   const handleSignIn = async () => {
     try {
@@ -48,10 +46,12 @@ const Menu = () => {
 
   const startGame = (mode: string) => {
     if ((mode === 'liveMatch' || mode === 'vsComputer') && !user) {
-      const now = Date.now();
-      if (now - lastToastTimeRef.current >= toastCooldown) {
-        toast("Please sign in!",{ autoClose: 10000 });
-        lastToastTimeRef.current = now;
+      if (canShowToast()) {
+        toast("Please sign in!", {
+          autoClose: 10000,
+          onClose: resetCooldown // reset cooldown immediately when closed
+        });
+        triggerToastCooldown();
       }
       return;
     }

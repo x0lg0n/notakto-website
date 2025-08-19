@@ -14,6 +14,7 @@ import DifficultyModal from '../../modals/DifficultyModal';
 import { findBestMove } from '@/services/ai';
 import { calculateRewards } from '@/services/economyUtils';
 import { toast } from "react-toastify";
+import { useToastCooldown } from "@/components/hooks/useToastCooldown";
 
 
 const Game = () => {
@@ -37,7 +38,8 @@ const Game = () => {
     const XP = useXP((state) => state.XP);
     const setXP = useXP((state) => state.setXP);
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
+    const { canShowToast, triggerToastCooldown } = useToastCooldown(4000);
+    
     const makeMove = (boardIndex: number, cellIndex: number) => {
         if (boards[boardIndex][cellIndex] !== '' || isBoardDead(boards[boardIndex], boardSize)) return;
 
@@ -93,19 +95,22 @@ const Game = () => {
                 setCoins(Coins - 100);
                 setBoards(gameHistory[gameHistory.length - 3]);
                 setGameHistory(h => h.slice(0, -2));
-            } else {
-                console.log('Insufficient Coins', 'You need at least 100 coins to undo!');
+            } else if (canShowToast()) {
+                toast('Insufficient Coins. You need at least 100 coins to undo!', { autoClose: 4500 });
+                triggerToastCooldown();
             }
-        } else {
-            console.log('No Moves', 'There are no moves to undo!');
+        } else if (canShowToast()) {
+            toast('No Moves available to undo!', { autoClose: 4500 });
+            triggerToastCooldown();
         }
     };
     const handleSkip = () => {
         if (Coins >= 200) {
             setCoins(Coins - 200);
             setCurrentPlayer(prev => prev === 1 ? 2 : 1);
-        } else {
-            console.log('Insufficient Coins', 'You need at least 200 coins to skip a move!');
+        } else if (canShowToast()) {
+            toast('Insufficient Coins. You need at least 200 coins to skip!', { autoClose: 4500 });
+            triggerToastCooldown();
         }
     };
     const handleBuyCoins = async (): Promise<void> => {
@@ -129,27 +134,39 @@ const Game = () => {
                 const paymentWindow = window.open(data.paymentUrl, '_blank');
 
                 if (!paymentWindow) {
-                    toast('Popup blocked. Please allow popups and try again.', {autoClose:4500})
+                    if (canShowToast()) {
+                        toast('Popup blocked. Please allow popups and try again.', { autoClose: 4500 });
+                        triggerToastCooldown();
+                    }
                     return;
                 }
 
-                // Start polling for payment status
                 checkPaymentStatus(
                     data.chargeId,
                     paymentWindow,
                     () => {
-                        toast('✅ Payment successful! 100 coins added to your account.',{autoClose:4500});
+                        if (canShowToast()) {
+                            toast('✅ Payment successful! 100 coins added to your account.', { autoClose: 4500 });
+                            triggerToastCooldown();
+                        }
                         setCoins(Coins + 100);
                     },
                     (reason) => {
-                        toast(`❌ ${reason}`,{autoClose:4500})
+                        if (canShowToast()) {
+                            toast(`❌ ${reason}`, { autoClose: 4500 });
+                            triggerToastCooldown();
+                        }
                     }
                 );
-            } else {
-                toast("Payment failed: Could not initiate payment",{autoClose:4500})
+            } else if (canShowToast()) {
+                toast("Payment failed: Could not initiate payment", { autoClose: 4500 });
+                triggerToastCooldown();
             }
         } catch (error) {
-            toast("Payment processing failed", {autoClose:4500})
+            if (canShowToast()) {
+                toast("Payment processing failed", { autoClose: 4500 });
+                triggerToastCooldown();
+            }
         } finally {
             setIsProcessingPayment(false);
         }
@@ -187,8 +204,6 @@ const Game = () => {
         }, 3000);
     };
 
-
-
     const router = useRouter();
     const exitToMenu = () => {
         router.push('/');
@@ -197,7 +212,7 @@ const Game = () => {
     useEffect(() => {
         resetGame(numberOfBoards, boardSize);
     }, []);
-    // AI Move Handler
+
     useEffect(() => {
         if (currentPlayer === 2) {
             const timeout = setTimeout(() => {
