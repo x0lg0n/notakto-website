@@ -31,7 +31,8 @@ const Game = () => {
     const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
     const [showDifficultyModal, setShowDifficultyModal] = useState<boolean>(false);
     const [difficulty, setDifficulty] = useState<DifficultyLevel>(1);
-
+    const [sessionId, setSessionId] = useState<string>('');
+    
     const mute = useMute((state) => state.mute);
     const setMute = useMute((state) => state.setMute);
     const Coins = useCoins((state) => state.coins);
@@ -40,6 +41,48 @@ const Game = () => {
     const setXP = useXP((state) => state.setXP);
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const { canShowToast, triggerToastCooldown } = useToastCooldown(4000);
+
+    // Initialize game from server
+  const initGame = async (num: number, size: BoardSize, diff: DifficultyLevel) => {
+    try {
+      const response = await fetch('/api/game', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create',
+          numberOfBoards: num,
+          boardSize: size,
+          difficulty: diff
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setSessionId(data.sessionId);
+        setBoards(data.gameState.boards);
+        setCurrentPlayer(data.gameState.currentPlayer);
+        setBoardSize(data.gameState.boardSize);
+        setNumberOfBoards(data.gameState.numberOfBoards);
+        setDifficulty(data.gameState.difficulty);
+        setGameHistory(data.gameState.gameHistory);
+      } else {
+        toast.error('Failed to initialize game');
+        // Fallback to client-side initialization
+        const initialBoards = Array(num).fill(null).map(() => Array(size * size).fill(''));
+        setBoards(initialBoards);
+        setCurrentPlayer(1);
+        setGameHistory([initialBoards]);
+      }
+    } catch (error) {
+      toast.error('Error initializing game');
+      // Fallback to client-side initialization
+      const initialBoards = Array(num).fill(null).map(() => Array(size * size).fill(''));
+      setBoards(initialBoards);
+      setCurrentPlayer(1);
+      setGameHistory([initialBoards]);
+    }
+  };
     
     const makeMove = (boardIndex: number, cellIndex: number) => {
         if (boards[boardIndex][cellIndex] !== '' || isBoardDead(boards[boardIndex], boardSize)) return;
