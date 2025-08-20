@@ -32,7 +32,8 @@ const Game = () => {
     const [showDifficultyModal, setShowDifficultyModal] = useState<boolean>(false);
     const [difficulty, setDifficulty] = useState<DifficultyLevel>(1);
     const [sessionId, setSessionId] = useState<string>('');
-    
+    const [isProcessingMove, setIsProcessingMove] = useState<boolean>(false);
+
     const mute = useMute((state) => state.mute);
     const setMute = useMute((state) => state.setMute);
     const Coins = useCoins((state) => state.coins);
@@ -43,95 +44,103 @@ const Game = () => {
     const { canShowToast, triggerToastCooldown } = useToastCooldown(4000);
 
     // Initialize game from server
-  const initGame = async (num: number, size: BoardSize, diff: DifficultyLevel) => {
-    try {
-      const response = await fetch('/api/game', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'create',
-          numberOfBoards: num,
-          boardSize: size,
-          difficulty: diff
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setSessionId(data.sessionId);
-        setBoards(data.gameState.boards);
-        setCurrentPlayer(data.gameState.currentPlayer);
-        setBoardSize(data.gameState.boardSize);
-        setNumberOfBoards(data.gameState.numberOfBoards);
-        setDifficulty(data.gameState.difficulty);
-        setGameHistory(data.gameState.gameHistory);
-      } else {
-        toast.error('Failed to initialize game');
-        // Fallback to client-side initialization
-        const initialBoards = Array(num).fill(null).map(() => Array(size * size).fill(''));
-        setBoards(initialBoards);
-        setCurrentPlayer(1);
-        setGameHistory([initialBoards]);
-      }
-    } catch (error) {
-      toast.error('Error initializing game');
-      // Fallback to client-side initialization
-      const initialBoards = Array(num).fill(null).map(() => Array(size * size).fill(''));
-      setBoards(initialBoards);
-      setCurrentPlayer(1);
-      setGameHistory([initialBoards]);
-    }
-  };
-    
-    const makeMove = (boardIndex: number, cellIndex: number) => {
-        if (boards[boardIndex][cellIndex] !== '' || isBoardDead(boards[boardIndex], boardSize)) return;
+    const initGame = async (num: number, size: BoardSize, diff: DifficultyLevel) => {
+        try {
+            const response = await fetch('/api/game', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'create',
+                    numberOfBoards: num,
+                    boardSize: size,
+                    difficulty: diff
+                })
+            });
 
-        const newBoards = boards.map((board, idx) =>
-            idx === boardIndex ? [
-                ...board.slice(0, cellIndex),
-                'X',
-                ...board.slice(cellIndex + 1)
-            ] : [...board]
-        );
-        playMoveSound(mute);
-        setBoards(newBoards);
-        setGameHistory([...gameHistory, newBoards]);
+            const data = await response.json();
 
-        if (newBoards.every(board => isBoardDead(board, boardSize))) {
-            const loser = currentPlayer;
-            const winner = loser === 1 ? 2 : 1;
-            const isHumanWinner = winner === 1;
-            const rewards = calculateRewards(isHumanWinner, difficulty, numberOfBoards, boardSize);
-
-            if (isHumanWinner) {
-                setCoins(Coins + rewards.coins);
-                setXP(XP + rewards.xp);
+            if (data.success) {
+                setSessionId(data.sessionId);
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setBoardSize(data.gameState.boardSize);
+                setNumberOfBoards(data.gameState.numberOfBoards);
+                setDifficulty(data.gameState.difficulty);
+                setGameHistory(data.gameState.gameHistory);
             } else {
-                setXP(Math.round(XP + rewards.xp * 0.25));
+                toast.error('Failed to initialize game');
+                // Fallback to client-side initialization
+                const initialBoards = Array(num).fill(null).map(() => Array(size * size).fill(''));
+                setBoards(initialBoards);
+                setCurrentPlayer(1);
+                setGameHistory([initialBoards]);
             }
-            const winnerName = winner === 1 ? "You" : "Computer";
-            setWinner(winnerName);
-            setShowWinnerModal(true);
-            playWinSound(mute);
-            return;
+        } catch (error) {
+            toast.error('Error initializing game');
+            // Fallback to client-side initialization
+            const initialBoards = Array(num).fill(null).map(() => Array(size * size).fill(''));
+            setBoards(initialBoards);
+            setCurrentPlayer(1);
+            setGameHistory([initialBoards]);
         }
-
-        setCurrentPlayer(prev => prev === 1 ? 2 : 1);
     };
 
-    const resetGame = (num: number, size: BoardSize) => {
-        const initialBoards = Array(num).fill(null).map(() => Array(size * size).fill(''));
-        setBoards(initialBoards);
-        setCurrentPlayer(1);
-        setGameHistory([initialBoards]);
+    const makeMove = async (boardIndex: number, cellIndex: number) => {
+        if (isProcessingMove) return;
+
+        setIsProcessingMove(true);
+        try {
+            const response = await fetch('/api/game', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'move',
+                    sessionId,
+                    boardIndex,
+                    cellIndex
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Update all game state from server
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setGameHistory(data.gameState.gameHistory);
+
+                playMoveSound(mute);
+
+                if (data.gameOver) {
+                    // Update coins and XP from server
+                    if (data.gameState.coins) setCoins(Coins + data.gameState.coins);
+                    if (data.gameState.xp) setXP(XP + data.gameState.xp);
+
+                    setWinner(data.gameState.winner);
+                    setShowWinnerModal(true);
+                    playWinSound(mute);
+                }
+            } else {
+                toast.error(data.error || 'Invalid move');
+            }
+        } catch (error) {
+            toast.error('Error making move');
+        } finally {
+            setIsProcessingMove(false);
+        }
+    };
+
+    // Reset game by creating a new session on the server
+    const resetGame = (num: number, size: BoardSize, diff: DifficultyLevel = difficulty) => {
         setShowWinnerModal(false);
+        initGame(num, size, diff);
     };
     const handleBoardConfigChange = (num: number, size: number) => {
-        setNumberOfBoards(Math.min(5, Math.max(1, num)));
+        const safeNum = Math.min(5, Math.max(1, num));
+        setNumberOfBoards(safeNum);
         setBoardSize(size as BoardSize);
         setShowBoardConfig(false);
-        resetGame(num, size as BoardSize);
+        resetGame(safeNum, size as BoardSize, difficulty);
     };
     const handleUndo = () => {
         if (gameHistory.length >= 3) {
@@ -164,24 +173,10 @@ const Game = () => {
     }
 
     useEffect(() => {
-        resetGame(numberOfBoards, boardSize);
+        // On mount, create a new session
+        initGame(numberOfBoards, boardSize, difficulty);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    useEffect(() => {
-        if (currentPlayer === 2) {
-            const timeout = setTimeout(() => {
-                try {
-                    const move = findBestMove(boards, difficulty, boardSize, numberOfBoards);
-                    if (move) {
-                        makeMove(move.boardIndex, move.cellIndex);
-                    }
-                } catch (error) {
-                    console.error("Error finding the best move:", error);
-                }
-            }, 500);
-            return () => clearTimeout(timeout);
-        }
-    }, [currentPlayer, boards, difficulty, boardSize, numberOfBoards]);
 
     return (
         <div className="flex flex-col min-h-screen bg-black relative">
@@ -283,7 +278,7 @@ const Game = () => {
                 winner={winner}
                 onPlayAgain={() => {
                     setShowWinnerModal(false);
-                    resetGame(numberOfBoards, boardSize);
+                    resetGame(numberOfBoards, boardSize, difficulty);
                 }}
                 onMenu={() => {
                     setShowWinnerModal(false);
@@ -301,7 +296,7 @@ const Game = () => {
                 onSelect={(level) => {
                     setDifficulty(level as DifficultyLevel);
                     setShowDifficultyModal(false);
-                    resetGame(numberOfBoards, boardSize);
+                    resetGame(numberOfBoards, boardSize, level as DifficultyLevel);
                 }}
                 onClose={() => setShowDifficultyModal(false)}
             />
