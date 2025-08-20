@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import PlayerNamesModal from '../../modals/PlayerNamesModal';
 import WinnerModal from '../../modals/WinnerModal';
 import BoardConfigModal from '../../modals/BoardConfigModal';
-import { GameButton } from '@/components/ui/GameButton';
+import { SettingButton } from '@/components/ui/SettingButton';
 
 const Game = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -103,44 +103,44 @@ const Game = () => {
             {isMenuOpen && (
                 <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999] flex items-center justify-center px-4 overflow-y-auto">
                     <div className="flex flex-wrap justify-center gap-4 max-w-4xl py-8">
-                        <GameButton onClick={
+                        <SettingButton onClick={
                             () => {
                                 resetGame(numberOfBoards, boardSize);
                                 setIsMenuOpen(false);
                             }
                         }>
                             Reset
-                        </GameButton>
+                        </SettingButton>
 
-                        <GameButton onClick={
+                        <SettingButton onClick={
                             () => {
                                 setShowBoardConfig(!showBoardConfig);
                                 setIsMenuOpen(false);
                             }
                         }>
                             Game Configuration
-                        </GameButton>
+                        </SettingButton>
 
-                        <GameButton onClick={
+                        <SettingButton onClick={
                             () => {
                                 setShowNameModal(true);
                                 setIsMenuOpen(false);
                             }
                         }>
                             Reset Names
-                        </GameButton>
+                        </SettingButton>
 
-                        <GameButton onClick={() => setMute(!mute)}>
+                        <SettingButton onClick={() => setMute(!mute)}>
                             Sound: {mute ? 'Off' : 'On'}
-                        </GameButton>
+                        </SettingButton>
 
-                        <GameButton onClick={exitToMenu}>
+                        <SettingButton onClick={exitToMenu}>
                             Main Menu
-                        </GameButton>
+                        </SettingButton>
 
-                        <GameButton onClick={toggleMenu}>
+                        <SettingButton onClick={toggleMenu}>
                             Return to Game
-                        </GameButton>
+                        </SettingButton>
                     </div>
                 </div>
             )}

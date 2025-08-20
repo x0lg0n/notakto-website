@@ -16,7 +16,7 @@ import { calculateRewards } from '@/services/economyUtils';
 import { toast } from "react-toastify";
 import { useToastCooldown } from "@/components/hooks/useToastCooldown";
 import { handleBuyCoins } from '@/services/payment';
-import { GameButton } from '@/components/ui/GameButton';
+import { SettingButton } from '@/components/ui/SettingButton';
 
 
 const Game = () => {
@@ -175,68 +175,66 @@ const Game = () => {
             {isMenuOpen && (
                 <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999] flex items-center justify-center px-4 overflow-y-auto">
                     <div className="flex flex-wrap justify-center gap-4 max-w-4xl py-8">
-                        <GameButton onClick={() => {
+                        <SettingButton onClick={() => {
                             resetGame(numberOfBoards, boardSize);
                             setIsMenuOpen(false);
                         }}>
                             Reset
-                        </GameButton>
-                        <GameButton onClick={() => {
+                        </SettingButton>
+                        <SettingButton onClick={() => {
                             setShowBoardConfig(!showBoardConfig);
                             setIsMenuOpen(false);
                         }
                         }>
                             Game Configuration
-                        </GameButton>
-                        <GameButton
+                        </SettingButton>
+                        <SettingButton
                             onClick={() => {
                                 handleUndo();
                                 setIsMenuOpen(false);
                             }}
                             disabled={Coins < 100}
-                            className={`${Coins < 100 ? 'bg-gray-600 cursor-not-allowed' : undefined}`}
+                            
                         >
                             Undo (100 coins)
-                        </GameButton>
-                        <GameButton
+                        </SettingButton>
+                        <SettingButton
                             onClick={() => {
                                 handleSkip();
                                 setIsMenuOpen(false);
                             }}
                             disabled={Coins < 200}
-                            className={`${Coins < 200 ? 'bg-gray-600 cursor-not-allowed' : undefined}`}
                         >
                             Skip a Move (200 coins)
-                        </GameButton>
+                        </SettingButton>
 
-                        <GameButton
+                        <SettingButton
                             onClick={() => handleBuyCoins(setIsProcessingPayment, canShowToast, triggerToastCooldown, setCoins, Coins)}
                             disabled={isProcessingPayment}
-                            className={` flex justify-center items-center gap-2 
-                                ${isProcessingPayment ? 'bg-gray-600 cursor-not-allowed' : undefined}`}
+                            className={` flex justify-center items-center gap-2 `}
                         >
                             {isProcessingPayment && <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />}
                             {isProcessingPayment ? 'Processing...' : 'Buy Coins (100)'}
-                        </GameButton>
-                        <GameButton onClick={() => {
+                        </SettingButton>
+                        <SettingButton onClick={() => {
                             setShowDifficultyModal(true);
                             setIsMenuOpen(false);
                         }}
                         >
                             AI Level: {difficulty}
-                        </GameButton>
+                        </SettingButton>
 
-                        <GameButton onClick={() => setMute(!mute)}>
+                        <SettingButton onClick={() => setMute(!mute)}>
                             Sound: {mute ? 'Off' : 'On'}
-                        </GameButton>
+                        </SettingButton>
 
-                        <GameButton onClick={exitToMenu}>
+                        <SettingButton onClick={exitToMenu}>
                             Main Menu
-                        </GameButton>
+                        </SettingButton>
 
-                        <GameButton onClick={toggleMenu}>
+                        <SettingButton onClick={toggleMenu}>
                             Return to Game
-                        </GameButton>
+                        </SettingButton>
                     </div>
                 </div>
             )}
