@@ -1,7 +1,8 @@
 import { useRouter } from "next/navigation";
 import { WinnerModalProps } from "@/services/types";
+import { WinnerButton } from "@/components/ui/WinnerButton";
 
-const WinnerModal = ({ visible, winner, onPlayAgain}: WinnerModalProps) => {
+const WinnerModal = ({ visible, winner, onPlayAgain }: WinnerModalProps) => {
   if (!visible) return null;
   const router = useRouter();
   const exitToMenu = () => {
@@ -16,19 +17,12 @@ const WinnerModal = ({ visible, winner, onPlayAgain}: WinnerModalProps) => {
         </p>
 
         <div className="flex justify-between gap-4 w-full">
-          <button
-            onClick={onPlayAgain}
-            className="bg-blue-600 text-white px-6 py-3 w-full hover:bg-blue-700"
-          >
+          <WinnerButton onClick={onPlayAgain}>
             Play Again
-          </button>
-
-          <button
-            onClick={exitToMenu}
-            className="bg-blue-600 text-white px-6 py-3 w-full hover:bg-blue-700"
-          >
+          </WinnerButton>
+          <WinnerButton onClick={exitToMenu}>
             Main Menu
-          </button>
+          </WinnerButton>
         </div>
       </div>
     </div>
