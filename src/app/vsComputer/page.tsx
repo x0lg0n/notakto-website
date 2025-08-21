@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Board from './Board';
-import { BoardSize, BoardState, DifficultyLevel } from '@/services/types';
+import { BoardSize, BoardState, DifficultyLevel, BoardNumber } from '@/services/types';
 import { isBoardDead } from '@/services/logic';
 import { playMoveSound, playWinSound } from '@/services/sounds';
 import { useMute } from '@/services/store';
@@ -11,27 +11,27 @@ import WinnerModal from '@/modals/WinnerModal';
 import BoardConfigModal from '@/modals/BoardConfigModal';
 import { useCoins, useXP } from '@/services/store';
 import DifficultyModal from '@/modals/DifficultyModal';
-import { findBestMove } from '@/services/ai';
-import { calculateRewards } from '@/services/economyUtils';
 import { toast } from "react-toastify";
 import { useToastCooldown } from "@/components/hooks/useToastCooldown";
 import { handleBuyCoins } from '@/services/payment';
 import { SettingButton } from '@/components/ui/SettingButton';
-
+import { createGame, makeMove, resetGame, updateConfig, undoMove, skipMove } from '@/services/game-apis';
 
 const Game = () => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const [boards, setBoards] = useState<BoardState[]>([]);
     const [boardSize, setBoardSize] = useState<BoardSize>(3);
     const [gameHistory, setGameHistory] = useState<BoardState[][]>([]);
     const [currentPlayer, setCurrentPlayer] = useState<number>(1);
     const [winner, setWinner] = useState<string>('');
     const [showWinnerModal, setShowWinnerModal] = useState<boolean>(false);
-    const [numberOfBoards, setNumberOfBoards] = useState<number>(3);
+    const [numberOfBoards, setNumberOfBoards] = useState<BoardNumber>(3);
     const [showBoardConfig, setShowBoardConfig] = useState<boolean>(false);
     const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
     const [showDifficultyModal, setShowDifficultyModal] = useState<boolean>(false);
     const [difficulty, setDifficulty] = useState<DifficultyLevel>(1);
+    const [sessionId, setSessionId] = useState<string>('');
+    const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
     const mute = useMute((state) => state.mute);
     const setMute = useMute((state) => state.setMute);
@@ -41,105 +41,163 @@ const Game = () => {
     const setXP = useXP((state) => state.setXP);
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const { canShowToast, triggerToastCooldown } = useToastCooldown(4000);
+    const router = useRouter();
 
-    const makeMove = (boardIndex: number, cellIndex: number) => {
-        if (boards[boardIndex][cellIndex] !== '' || isBoardDead(boards[boardIndex], boardSize)) return;
-
-        const newBoards = boards.map((board, idx) =>
-            idx === boardIndex ? [
-                ...board.slice(0, cellIndex),
-                'X',
-                ...board.slice(cellIndex + 1)
-            ] : [...board]
-        );
-        playMoveSound(mute);
-        setBoards(newBoards);
-        setGameHistory([...gameHistory, newBoards]);
-
-        if (newBoards.every(board => isBoardDead(board, boardSize))) {
-            const loser = currentPlayer;
-            const winner = loser === 1 ? 2 : 1;
-            const isHumanWinner = winner === 1;
-            const rewards = calculateRewards(isHumanWinner, difficulty, numberOfBoards, boardSize);
-
-            if (isHumanWinner) {
-                setCoins(Coins + rewards.coins);
-                setXP(XP + rewards.xp);
+    const initGame = async (num: BoardNumber, size: BoardSize, diff: DifficultyLevel) => {
+        try {
+            const data = await createGame(num, size, diff);
+            if (data.success && data.gameState) {
+                setSessionId(data.sessionId);
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setBoardSize(data.gameState.boardSize);
+                setNumberOfBoards(data.gameState.numberOfBoards);
+                setDifficulty(data.gameState.difficulty);
+                setGameHistory(data.gameState.gameHistory);
+            } else if ('error' in data) {
+                toast.error(data.error || 'Failed to create game');
             } else {
-                setXP(Math.round(XP + rewards.xp * 0.25));
+                toast.error('Unexpected response from server');
             }
-            const winnerName = winner === 1 ? "You" : "Computer";
-            setWinner(winnerName);
-            setShowWinnerModal(true);
-            playWinSound(mute);
+        } catch (error) {
+            toast.error('Error initializing game');
+            router.push('/');
+        }
+    };
+
+    const handleMove = async (boardIndex: number, cellIndex: number) => {
+        if (isProcessing) return;
+        setIsProcessing(true);
+        try {
+            const data = await makeMove(sessionId, boardIndex, cellIndex);
+            if (data.success) {
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setGameHistory(data.gameState.gameHistory);
+                playMoveSound(mute);
+
+                if (data.gameOver) {
+                    if (data.gameState.coins) setCoins(Coins + data.gameState.coins);
+                    if (data.gameState.xp) setXP(XP + data.gameState.xp);
+                    setWinner(data.gameState.winner);
+                    setShowWinnerModal(true);
+                    playWinSound(mute);
+                }
+            } else if ('error' in data) {
+                toast.error(data.error || 'Invalid move');
+            } else {
+                toast.error('Unexpected response from server');
+            }
+        } catch (error) {
+            toast.error('Error making move');
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    const handleReset = async () => {
+        try {
+            const data = await resetGame(sessionId);
+            if (data.success) {
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setGameHistory(data.gameState.gameHistory);
+                setWinner('');
+                setShowWinnerModal(false);
+            } else if ('error' in data) {
+                toast.error(data.error || 'Failed to reset game');
+            } else {
+                toast.error('Unexpected response from server');
+            }
+        } catch (error) {
+            toast.error('Error resetting game');
+        }
+    };
+
+    const handleUndo = async () => {
+        if (Coins < 100) {
+            toast.error('Not enough coins');
             return;
         }
-
-        setCurrentPlayer(prev => prev === 1 ? 2 : 1);
-    };
-
-    const resetGame = (num: number, size: BoardSize) => {
-        const initialBoards = Array(num).fill(null).map(() => Array(size * size).fill(''));
-        setBoards(initialBoards);
-        setCurrentPlayer(1);
-        setGameHistory([initialBoards]);
-        setShowWinnerModal(false);
-    };
-    const handleBoardConfigChange = (num: number, size: BoardSize) => {
-        setNumberOfBoards(Math.min(5, Math.max(1, num)));
-        setBoardSize(size);
-        setShowBoardConfig(false);
-        resetGame(num, size);
-    };
-    const handleUndo = () => {
-        if (gameHistory.length >= 3) {
-            if (Coins >= 100) {
+        try {
+            const data = await undoMove(sessionId);
+            if (data.success) {
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setGameHistory(data.gameState.gameHistory);
                 setCoins(Coins - 100);
-                setBoards(gameHistory[gameHistory.length - 3]);
-                setGameHistory(h => h.slice(0, -2));
-            } else if (canShowToast()) {
-                toast('Insufficient Coins. You need at least 100 coins to undo!', { autoClose: 4500 });
-                triggerToastCooldown();
+            } else if ('error' in data) {
+                toast.error(data.error || 'Failed to undo move');
+            } else {
+                toast.error('Unexpected response from server');
             }
-        } else if (canShowToast()) {
-            toast('No Moves available to undo!', { autoClose: 4500 });
-            triggerToastCooldown();
-        }
-    };
-    const handleSkip = () => {
-        if (Coins >= 200) {
-            setCoins(Coins - 200);
-            setCurrentPlayer(prev => prev === 1 ? 2 : 1);
-        } else if (canShowToast()) {
-            toast('Insufficient Coins. You need at least 200 coins to skip!', { autoClose: 4500 });
-            triggerToastCooldown();
+        } catch (error) {
+            toast.error('Error undoing move');
         }
     };
 
-    const router = useRouter();
-    const exitToMenu = () => {
-        router.push('/');
-    }
+    const handleSkip = async () => {
+        if (Coins < 200) {
+            toast.error('Not enough coins');
+            return;
+        }
+        try {
+            const data = await skipMove(sessionId);
+            if (data.success) {
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setGameHistory(data.gameState.gameHistory);
+                setCoins(Coins - 200);
+            } else if ('error' in data) {
+                toast.error(data.error || 'Failed to skip move');
+            } else {
+                toast.error('Unexpected response from server');
+            }
+        } catch (error) {
+            toast.error('Error skipping move');
+        }
+    };
+
+    const handleBoardConfigChange = async (newNumberOfBoards: BoardNumber, newBoardSize: BoardSize) => {
+        try {
+            const data = await updateConfig(sessionId, newNumberOfBoards, newBoardSize, difficulty);
+            if (data.success) {
+                setNumberOfBoards(newNumberOfBoards);
+                setBoardSize(newBoardSize);
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setGameHistory(data.gameState.gameHistory);
+            } else if ('error' in data) {
+                toast.error(data.error || 'Failed to update config');
+            } else {
+                toast.error('Unexpected response from server');
+            }
+        } catch (error) {
+            toast.error('Error updating config');
+        }
+    };
+
+    const handleDifficultyChange = async (level: DifficultyLevel) => {
+        try {
+            const data = await updateConfig(sessionId, numberOfBoards, boardSize, level);
+            if (data.success) {
+                setDifficulty(level);
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setGameHistory(data.gameState.gameHistory);
+            } else if ('error' in data) {
+                toast.error(data.error || 'Failed to update difficulty');
+            } else {
+                toast.error('Unexpected response from server');
+            }
+        } catch (error) {
+            toast.error('Error updating difficulty');
+        }
+    };
 
     useEffect(() => {
-        resetGame(numberOfBoards, boardSize);
+        initGame(numberOfBoards, boardSize, difficulty);
     }, []);
-
-    useEffect(() => {
-        if (currentPlayer === 2) {
-            const timeout = setTimeout(() => {
-                try {
-                    const move = findBestMove(boards, difficulty, boardSize, numberOfBoards);
-                    if (move) {
-                        makeMove(move.boardIndex, move.cellIndex);
-                    }
-                } catch (error) {
-                    console.error("Error finding the best move:", error);
-                }
-            }, 500);
-            return () => clearTimeout(timeout);
-        }
-    }, [currentPlayer, boards, difficulty, boardSize, numberOfBoards]);
 
     return (
         <div className="flex flex-col min-h-screen bg-black relative">
@@ -149,7 +207,6 @@ const Game = () => {
                         <span className="text-red-600 text-[35px] ">Coins: {Coins}</span>
                         <span className="text-red-600 text-[35px] "> | XP: {XP}</span>
                     </div>
-
                     <h2 className="text-red-600 text-[80px] mb-5 text-center">{currentPlayer == 1 ? "You" : "Computer"}</h2>
                 </div>
 
@@ -159,7 +216,7 @@ const Game = () => {
                             <Board
                                 boardIndex={index}
                                 boardState={board}
-                                makeMove={makeMove}
+                                makeMove={handleMove}
                                 isDead={isBoardDead(board, boardSize)}
                                 boardSize={boardSize}
                             />
@@ -175,21 +232,42 @@ const Game = () => {
             {isMenuOpen && (
                 <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999] flex items-center justify-center px-4 overflow-y-auto">
                     <div className="flex flex-wrap justify-center gap-4 max-w-4xl py-8">
-                        <SettingButton onClick={() => { resetGame(numberOfBoards, boardSize); setIsMenuOpen(false); }}>Reset</SettingButton>
-                        <SettingButton onClick={() => { setShowBoardConfig(!showBoardConfig); setIsMenuOpen(false); }}>Game Configuration</SettingButton>
+                        <SettingButton onClick={() => { handleReset(); setIsMenuOpen(false); }}>Reset</SettingButton>
+                        <SettingButton onClick={() => { setShowBoardConfig(true); setIsMenuOpen(false); }}>Game Configuration</SettingButton>
                         <SettingButton onClick={() => { handleUndo(); setIsMenuOpen(false); }} disabled={Coins < 100}>Undo (100 coins)</SettingButton>
                         <SettingButton onClick={() => { handleSkip(); setIsMenuOpen(false); }} disabled={Coins < 200}>Skip a Move (200 coins)</SettingButton>
                         <SettingButton onClick={() => handleBuyCoins(setIsProcessingPayment, canShowToast, triggerToastCooldown, setCoins, Coins)} disabled={isProcessingPayment} loading={isProcessingPayment}>Buy Coins (100)</SettingButton>
                         <SettingButton onClick={() => { setShowDifficultyModal(true); setIsMenuOpen(false); }}>AI Level: {difficulty}</SettingButton>
                         <SettingButton onClick={() => setMute(!mute)}>Sound: {mute ? 'Off' : 'On'}</SettingButton>
-                        <SettingButton onClick={exitToMenu}>Main Menu</SettingButton>
+                        <SettingButton onClick={() => router.push('/')}>Main Menu</SettingButton>
                         <SettingButton onClick={toggleMenu}>Return to Game</SettingButton>
                     </div>
                 </div>
             )}
-            <WinnerModal visible={showWinnerModal} winner={winner} onPlayAgain={() => { setShowWinnerModal(false); resetGame(numberOfBoards, boardSize); }} onMenu={() => { setShowWinnerModal(false); }} />
-            <BoardConfigModal visible={showBoardConfig} currentBoards={numberOfBoards} currentSize={boardSize} onConfirm={handleBoardConfigChange} onCancel={() => setShowBoardConfig(false)}/>
-            <DifficultyModal visible={showDifficultyModal} onSelect={(level) => { setDifficulty(level as DifficultyLevel); setShowDifficultyModal(false); resetGame(numberOfBoards, boardSize); }} onClose={() => setShowDifficultyModal(false)}/>
+
+            <WinnerModal
+                visible={showWinnerModal}
+                winner={winner}
+                onPlayAgain={() => { setShowWinnerModal(false); handleReset(); }}
+                onMenu={() => { setShowWinnerModal(false); router.push('/'); }}
+            />
+
+            <BoardConfigModal
+                visible={showBoardConfig}
+                currentBoards={numberOfBoards}
+                currentSize={boardSize}
+                onConfirm={handleBoardConfigChange}
+                onCancel={() => setShowBoardConfig(false)}
+            />
+
+            <DifficultyModal
+                visible={showDifficultyModal}
+                onSelect={(level: DifficultyLevel) => {
+                    handleDifficultyChange(level);
+                    setShowDifficultyModal(false);
+                }}
+                onClose={() => setShowDifficultyModal(false)}
+            />
         </div>
     );
 };

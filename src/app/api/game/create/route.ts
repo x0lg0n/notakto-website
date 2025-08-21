@@ -17,8 +17,8 @@ export async function POST(request: NextRequest) {
       numberOfBoards,
       difficulty,
       gameHistory: [initialBoards],
-      coins: 0,
-      xp: 0
+      sessionId: sessionId,
+      gameOver: false
     };
     
     gameSessions.set(sessionId, gameState);
