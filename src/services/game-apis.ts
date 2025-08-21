@@ -1,19 +1,12 @@
-import { BoardSize, DifficultyLevel } from './types';
+import { BoardSize, DifficultyLevel, errorResponse, makeMoveResponse, newGame, resetGameResponse, skipMoveResponse, undoMoveResponse, updateConfigResponse } from './types';
 
 const API_BASE = '/api/game';
-
-export interface ApiResponse {
-  success: boolean;
-  gameState?: any;
-  gameOver?: boolean;
-  error?: string;
-}
 
 export async function createGame(
   numberOfBoards: number, 
   boardSize: BoardSize, 
   difficulty: DifficultyLevel
-): Promise<ApiResponse> {
+): Promise<newGame | errorResponse> {
   try {
     const response = await fetch(`${API_BASE}/create`, {
       method: 'POST',
@@ -31,7 +24,7 @@ export async function makeMove(
   sessionId: string, 
   boardIndex: number, 
   cellIndex: number
-): Promise<ApiResponse> {
+): Promise<makeMoveResponse | errorResponse> {
   try {
     const response = await fetch(`${API_BASE}/move`, {
       method: 'POST',
@@ -45,7 +38,7 @@ export async function makeMove(
   }
 }
 
-export async function resetGame(sessionId: string): Promise<ApiResponse> {
+export async function resetGame(sessionId: string): Promise<resetGameResponse | errorResponse> {
   try {
     const response = await fetch(`${API_BASE}/reset`, {
       method: 'POST',
@@ -64,7 +57,7 @@ export async function updateConfig(
   numberOfBoards: number,
   boardSize: BoardSize,
   difficulty: DifficultyLevel
-): Promise<ApiResponse> {
+): Promise<updateConfigResponse | errorResponse> {
   try {
     const response = await fetch(`${API_BASE}/config`, {
       method: 'POST',
@@ -78,7 +71,7 @@ export async function updateConfig(
   }
 }
 
-export async function undoMove(sessionId: string): Promise<ApiResponse> {
+export async function undoMove(sessionId: string): Promise<undoMoveResponse | errorResponse> {
   try {
     const response = await fetch(`${API_BASE}/undo`, {
       method: 'POST',
@@ -92,7 +85,7 @@ export async function undoMove(sessionId: string): Promise<ApiResponse> {
   }
 }
 
-export async function skipMove(sessionId: string): Promise<ApiResponse> {
+export async function skipMove(sessionId: string): Promise<skipMoveResponse | errorResponse> {
   try {
     const response = await fetch(`${API_BASE}/skip`, {
       method: 'POST',

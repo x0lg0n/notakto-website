@@ -17,8 +17,6 @@ export async function POST(request: NextRequest) {
     gameState.currentPlayer = 1;
     gameState.winner = '';
     gameState.gameHistory = [initialBoards];
-    gameState.coins = 0;
-    gameState.xp = 0;
     
     gameSessions.set(sessionId, gameState);
     return NextResponse.json({ success: true, gameState });

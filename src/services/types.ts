@@ -1,8 +1,8 @@
-// types.ts
 export type BoardState = Array<string>;
 export type GameMode = 'vsComputer' | 'vsPlayer' | 'liveMatch' | null;
 export type DifficultyLevel = 1 | 2 | 3 | 4 | 5;
 export type BoardSize = 2 | 3 | 4 | 5;
+export type BoardNumber = 1 | 2 | 3 | 4 | 5;
 export type MenuProps = {
   startGame: (mode: 'vsPlayer' | 'vsComputer'| 'liveMatch') => void;
   showTutorial: () => void;
@@ -79,14 +79,14 @@ export type PlayerNamesModalProps = {
 };
 export type DifficultyModalProps = {
   visible: boolean;
-  onSelect: (level: number) => void;
+  onSelect: (level: DifficultyLevel) => void;
   onClose: () => void;
 };
 export type BoardConfigModalProps = {
   visible: boolean;
   currentBoards: number;
   currentSize: BoardSize;
-  onConfirm: (num: number, size: BoardSize) => void;
+  onConfirm: (num: BoardNumber, size: BoardSize) => void;
   onCancel: () => void;
 };
 export interface GameState {
@@ -94,9 +94,49 @@ export interface GameState {
   currentPlayer: 1 | 2;
   winner: string;
   boardSize: BoardSize;
-  numberOfBoards: number;
+  numberOfBoards: BoardNumber;
   difficulty: DifficultyLevel;
   gameHistory: BoardState[][];
-  coins: number;
-  xp: number;
+  coins?: number;
+  xp?: number;
+  sessionId?: string;
+  gameOver?: boolean;
+}
+
+export interface newGame{
+  sessionId: string;
+  gameState: GameState;
+  success: boolean;
+}
+
+export interface makeMoveResponse {
+  gameState: GameState;
+  gameOver: boolean;
+  success: boolean;
+}
+
+export interface resetGameResponse {
+  gameState: GameState;
+  success: boolean;
+}
+export interface updateConfigResponse {
+  sessionId: string;
+  gameState: GameState;
+  success: boolean;
+}
+
+export interface undoMoveResponse {
+  sessionId: string;
+  gameState: GameState;
+  success: boolean;
+}
+export interface skipMoveResponse {
+  sessionId: string;
+  gameState: GameState;
+  success: boolean;
+}
+
+export interface errorResponse {
+  success: false;
+  error: string;
 }

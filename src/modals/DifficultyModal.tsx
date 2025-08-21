@@ -1,4 +1,4 @@
-import { DifficultyModalProps } from "../services/types";
+import { DifficultyLevel, DifficultyModalProps } from "../services/types";
 
 const DifficultyModal = ({ visible, onSelect, onClose }: DifficultyModalProps) => {
   if (!visible) return null;
@@ -11,7 +11,7 @@ const DifficultyModal = ({ visible, onSelect, onClose }: DifficultyModalProps) =
         {[1, 2, 3, 4, 5].map(level => (
           <button
             key={level}
-            onClick={() => onSelect(level)}
+            onClick={() => onSelect(level as DifficultyLevel)}
             className="w-full py-3 my-2 bg-blue-600 text-white text-3xl hover:bg-blue-700 transition"
           >
             Level {level}
