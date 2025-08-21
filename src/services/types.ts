@@ -89,3 +89,14 @@ export type BoardConfigModalProps = {
   onConfirm: (num: number, size: BoardSize) => void;
   onCancel: () => void;
 };
+export interface GameState {
+  boards: BoardState[];
+  currentPlayer: 1 | 2;
+  winner: string;
+  boardSize: BoardSize;
+  numberOfBoards: number;
+  difficulty: DifficultyLevel;
+  gameHistory: BoardState[][];
+  coins: number;
+  xp: number;
+}
