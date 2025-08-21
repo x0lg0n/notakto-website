@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import PlayerNamesModal from '../../modals/PlayerNamesModal';
 import WinnerModal from '../../modals/WinnerModal';
 import BoardConfigModal from '../../modals/BoardConfigModal';
-
+import { SettingButton } from '@/components/ui/SettingButton';
 
 const Game = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -103,34 +103,44 @@ const Game = () => {
             {isMenuOpen && (
                 <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999] flex items-center justify-center px-4 overflow-y-auto">
                     <div className="flex flex-wrap justify-center gap-4 max-w-4xl py-8">
-                        <button onClick={() => {
-                            resetGame(numberOfBoards, boardSize);
-                            setIsMenuOpen(false);
-                        }} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
+                        <SettingButton onClick={
+                            () => {
+                                resetGame(numberOfBoards, boardSize);
+                                setIsMenuOpen(false);
+                            }
+                        }>
                             Reset
-                        </button>
-                        <button onClick={() => {
-                            setShowBoardConfig(!showBoardConfig);
-                            setIsMenuOpen(false);
-                        }
-                        } className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
+                        </SettingButton>
+
+                        <SettingButton onClick={
+                            () => {
+                                setShowBoardConfig(!showBoardConfig);
+                                setIsMenuOpen(false);
+                            }
+                        }>
                             Game Configuration
-                        </button>
-                        <button onClick={() => {
-                            setShowNameModal(true);
-                            setIsMenuOpen(false);
-                        }} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
+                        </SettingButton>
+
+                        <SettingButton onClick={
+                            () => {
+                                setShowNameModal(true);
+                                setIsMenuOpen(false);
+                            }
+                        }>
                             Reset Names
-                        </button>
-                        <button onClick={() => setMute(!mute)} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
+                        </SettingButton>
+
+                        <SettingButton onClick={() => setMute(!mute)}>
                             Sound: {mute ? 'Off' : 'On'}
-                        </button>
-                        <button onClick={exitToMenu} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
+                        </SettingButton>
+
+                        <SettingButton onClick={exitToMenu}>
                             Main Menu
-                        </button>
-                        <button onClick={toggleMenu} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
+                        </SettingButton>
+
+                        <SettingButton onClick={toggleMenu}>
                             Return to Game
-                        </button>
+                        </SettingButton>
                     </div>
                 </div>
             )}

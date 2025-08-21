@@ -16,6 +16,7 @@ import { calculateRewards } from '@/services/economyUtils';
 import { toast } from "react-toastify";
 import { useToastCooldown } from "@/components/hooks/useToastCooldown";
 import { handleBuyCoins } from '@/services/payment';
+import { SettingButton } from '@/components/ui/SettingButton';
 
 
 const Game = () => {
@@ -40,7 +41,7 @@ const Game = () => {
     const setXP = useXP((state) => state.setXP);
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const { canShowToast, triggerToastCooldown } = useToastCooldown(4000);
-    
+
     const makeMove = (boardIndex: number, cellIndex: number) => {
         if (boards[boardIndex][cellIndex] !== '' || isBoardDead(boards[boardIndex], boardSize)) return;
 
@@ -174,64 +175,65 @@ const Game = () => {
             {isMenuOpen && (
                 <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999] flex items-center justify-center px-4 overflow-y-auto">
                     <div className="flex flex-wrap justify-center gap-4 max-w-4xl py-8">
-                        <button onClick={() => {
+                        <SettingButton onClick={() => {
                             resetGame(numberOfBoards, boardSize);
                             setIsMenuOpen(false);
-                        }} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
+                        }}>
                             Reset
-                        </button>
-                        <button onClick={() => {
+                        </SettingButton>
+                        <SettingButton onClick={() => {
                             setShowBoardConfig(!showBoardConfig);
                             setIsMenuOpen(false);
                         }
-                        } className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
+                        }>
                             Game Configuration
-                        </button>
-                        <button
+                        </SettingButton>
+                        <SettingButton
                             onClick={() => {
                                 handleUndo();
                                 setIsMenuOpen(false);
                             }}
                             disabled={Coins < 100}
-                            className={`w-full sm:w-[45%] py-4 text-white text-[30px] ${Coins < 100 ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
+                            
                         >
                             Undo (100 coins)
-                        </button>
-                        <button
+                        </SettingButton>
+                        <SettingButton
                             onClick={() => {
                                 handleSkip();
                                 setIsMenuOpen(false);
                             }}
                             disabled={Coins < 200}
-                            className={`w-full sm:w-[45%] py-4 text-white text-[30px] ${Coins < 200 ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
                         >
                             Skip a Move (200 coins)
-                        </button>
-                        <button
+                        </SettingButton>
+
+                        <SettingButton
                             onClick={() => handleBuyCoins(setIsProcessingPayment, canShowToast, triggerToastCooldown, setCoins, Coins)}
                             disabled={isProcessingPayment}
-                            className={`w-full sm:w-[45%] flex justify-center items-center gap-2 py-4 text-white text-[30px] ${isProcessingPayment ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600'}`}
+                            loading={isProcessingPayment}
                         >
-                            {isProcessingPayment && <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />}
-                            {isProcessingPayment ? 'Processing...' : 'Buy Coins (100)'}
-                        </button>
-                        <button onClick={() => {
+                            Buy Coins (100)
+                        </SettingButton>
+                        <SettingButton onClick={() => {
                             setShowDifficultyModal(true);
                             setIsMenuOpen(false);
                         }}
-                            className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]"
                         >
                             AI Level: {difficulty}
-                        </button>
-                        <button onClick={() => setMute(!mute)} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
+                        </SettingButton>
+
+                        <SettingButton onClick={() => setMute(!mute)}>
                             Sound: {mute ? 'Off' : 'On'}
-                        </button>
-                        <button onClick={exitToMenu} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
+                        </SettingButton>
+
+                        <SettingButton onClick={exitToMenu}>
                             Main Menu
-                        </button>
-                        <button onClick={toggleMenu} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
+                        </SettingButton>
+
+                        <SettingButton onClick={toggleMenu}>
                             Return to Game
-                        </button>
+                        </SettingButton>
                     </div>
                 </div>
             )}
