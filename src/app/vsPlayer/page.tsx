@@ -7,9 +7,9 @@ import { isBoardDead } from '@/services/logic';
 import { playMoveSound, playWinSound } from '@/services/sounds';
 import { useMute } from '@/services/store';
 import { useRouter } from 'next/navigation';
-import PlayerNamesModal from '../../modals/PlayerNamesModal';
-import WinnerModal from '../../modals/WinnerModal';
-import BoardConfigModal from '../../modals/BoardConfigModal';
+import PlayerNamesModal from '@/modals/PlayerNamesModal';
+import WinnerModal from '@/modals/WinnerModal';
+import BoardConfigModal from '@/modals/BoardConfigModal';
 import { SettingButton } from '@/components/ui/SettingButton';
 
 const Game = () => {
@@ -22,13 +22,13 @@ const Game = () => {
     const [showNameModal, setShowNameModal] = useState<boolean>(true);
     const [winner, setWinner] = useState<string>('');
     const [showWinnerModal, setShowWinnerModal] = useState<boolean>(false);
-    const [numberOfBoards, setNumberOfBoards] = useState(3);
+    const [numberOfBoards, setNumberOfBoards] = useState<number>(3);
     const [showBoardConfig, setShowBoardConfig] = useState<boolean>(false);
 
     const mute = useMute((state) => state.mute);
     const setMute = useMute((state) => state.setMute);
-
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+    const router = useRouter();
 
     const makeMove = (boardIndex: number, cellIndex: number) => {
         if (boards[boardIndex][cellIndex] !== '' || isBoardDead(boards[boardIndex], boardSize)) return;
@@ -45,8 +45,8 @@ const Game = () => {
 
         if (newBoards.every(board => isBoardDead(board, boardSize))) {
             const loser = currentPlayer;
-            const winner = loser === 1 ? 2 : 1;
-            const winnerName = winner === 1 ? player1Name : player2Name;
+            const winnerNum = loser === 1 ? 2 : 1;
+            const winnerName = winnerNum === 1 ? player1Name : player2Name;
             setWinner(winnerName);
             setShowWinnerModal(true);
             playWinSound(mute);
@@ -62,6 +62,7 @@ const Game = () => {
         setCurrentPlayer(1);
         setShowWinnerModal(false);
     };
+
     const handleBoardConfigChange = (num: number, size: number) => {
         setNumberOfBoards(Math.min(5, Math.max(1, num)));
         setBoardSize(size as BoardSize);
@@ -69,16 +70,15 @@ const Game = () => {
         resetGame(num, size as BoardSize);
     };
 
-    const router = useRouter();
     const exitToMenu = () => {
         router.push('/');
-    }
+    };
 
     return (
         <div className="flex flex-col min-h-screen bg-black relative">
             <div className="flex-1">
                 <div className="flex flex-col items-center px-6 py-4 -mb-8">
-                    <h2 className="text-red-600 text-[80px] mb-5 text-center">{currentPlayer == 1 ? `${player1Name}` : `${player2Name}`}</h2>
+                    <h2 className="text-red-600 text-[80px] mb-5 text-center">{currentPlayer === 1 ? player1Name : player2Name}</h2>
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-4 p-4 w-full mb-20">
@@ -103,44 +103,12 @@ const Game = () => {
             {isMenuOpen && (
                 <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999] flex items-center justify-center px-4 overflow-y-auto">
                     <div className="flex flex-wrap justify-center gap-4 max-w-4xl py-8">
-                        <SettingButton onClick={
-                            () => {
-                                resetGame(numberOfBoards, boardSize);
-                                setIsMenuOpen(false);
-                            }
-                        }>
-                            Reset
-                        </SettingButton>
-
-                        <SettingButton onClick={
-                            () => {
-                                setShowBoardConfig(!showBoardConfig);
-                                setIsMenuOpen(false);
-                            }
-                        }>
-                            Game Configuration
-                        </SettingButton>
-
-                        <SettingButton onClick={
-                            () => {
-                                setShowNameModal(true);
-                                setIsMenuOpen(false);
-                            }
-                        }>
-                            Reset Names
-                        </SettingButton>
-
-                        <SettingButton onClick={() => setMute(!mute)}>
-                            Sound: {mute ? 'Off' : 'On'}
-                        </SettingButton>
-
-                        <SettingButton onClick={exitToMenu}>
-                            Main Menu
-                        </SettingButton>
-
-                        <SettingButton onClick={toggleMenu}>
-                            Return to Game
-                        </SettingButton>
+                        <SettingButton onClick={() => { resetGame(numberOfBoards, boardSize); setIsMenuOpen(false); }}>Reset</SettingButton>
+                        <SettingButton onClick={() => { setShowBoardConfig(!showBoardConfig); setIsMenuOpen(false); }}>Game Configuration</SettingButton>
+                        <SettingButton onClick={() => { setShowNameModal(true); setIsMenuOpen(false); }}>Reset Names</SettingButton>
+                        <SettingButton onClick={() => setMute(!mute)}>Sound: {mute ? 'Off' : 'On'}</SettingButton>
+                        <SettingButton onClick={exitToMenu}>Main Menu</SettingButton>
+                        <SettingButton onClick={toggleMenu}>Return to Game</SettingButton>
                     </div>
                 </div>
             )}
@@ -148,12 +116,12 @@ const Game = () => {
             <PlayerNamesModal
                 visible={showNameModal}
                 onSubmit={(name1: string, name2: string) => {
-                    setPlayer1Name(name1 || 'Player 1'); // Handle empty names
+                    setPlayer1Name(name1 || 'Player 1');
                     setPlayer2Name(name2 || 'Player 2');
                     setShowNameModal(false);
-                    resetGame(numberOfBoards, boardSize); // Reset game after name change
+                    resetGame(numberOfBoards, boardSize);
                 }}
-                initialNames={[player1Name, player2Name]} // Pass current names
+                initialNames={[player1Name, player2Name]}
                 key={player1Name + player2Name}
             />
             <WinnerModal
