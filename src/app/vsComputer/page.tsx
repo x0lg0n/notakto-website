@@ -229,28 +229,89 @@ const Game = () => {
             setIsProcessing(false);
         }
     };
-    const handleUndo = () => {
-        if (gameHistory.length >= 3) {
-            if (Coins >= 100) {
-                setCoins(Coins - 100);
-                setBoards(gameHistory[gameHistory.length - 3]);
-                setGameHistory(h => h.slice(0, -2));
-            } else if (canShowToast()) {
+    const handleUndo = async () => {
+        if (Coins < 100) {
+            if (canShowToast()) {
                 toast('Insufficient Coins. You need at least 100 coins to undo!', { autoClose: 4500 });
                 triggerToastCooldown();
             }
-        } else if (canShowToast()) {
-            toast('No Moves available to undo!', { autoClose: 4500 });
-            triggerToastCooldown();
+            return;
+        }
+
+        setIsProcessing(true);
+        try {
+            const response = await fetch('/api/game', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'undo',
+                    sessionId
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setCoins(Coins - 100);
+                // Update all game state from server
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setGameHistory(data.gameState.gameHistory);
+            } else {
+                toast.error(data.error || 'Failed to undo move');
+            }
+        } catch (error) {
+            toast.error('Error undoing move');
+        } finally {
+            setIsProcessing(false);
         }
     };
-    const handleSkip = () => {
-        if (Coins >= 200) {
-            setCoins(Coins - 200);
-            setCurrentPlayer(prev => prev === 1 ? 2 : 1);
-        } else if (canShowToast()) {
-            toast('Insufficient Coins. You need at least 200 coins to skip!', { autoClose: 4500 });
-            triggerToastCooldown();
+
+    const handleSkip = async () => {
+        if (Coins < 200) {
+            if (canShowToast()) {
+                toast('Insufficient Coins. You need at least 200 coins to skip!', { autoClose: 4500 });
+                triggerToastCooldown();
+            }
+            return;
+        }
+
+        setIsProcessing(true);
+        try {
+            const response = await fetch('/api/game', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'skip',
+                    sessionId
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setCoins(Coins - 200);
+                // Update all game state from server
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setGameHistory(data.gameState.gameHistory);
+
+                if (data.gameOver) {
+                    // Update coins and XP from server
+                    if (data.gameState.coins) setCoins(Coins + data.gameState.coins - 200);
+                    if (data.gameState.xp) setXP(XP + data.gameState.xp);
+
+                    setWinner(data.gameState.winner);
+                    setShowWinnerModal(true);
+                    playWinSound(mute);
+                }
+            } else {
+                toast.error(data.error || 'Failed to skip move');
+            }
+        } catch (error) {
+            toast.error('Error skipping move');
+        } finally {
+            setIsProcessing(false);
         }
     };
 

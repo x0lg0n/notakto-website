@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { BoardState, BoardSize, DifficultyLevel } from '@/services/types';
 import { findBestMove, isBoardDead, updateBoards } from '@/services/ai';
 import { calculateRewards } from '@/services/economyUtils';
 
@@ -140,7 +139,7 @@ export async function POST(request: NextRequest) {
 
             gameSessions.set(sessionId, gameState);
             return NextResponse.json({ success: true, gameState });
-        }else if (action === 'config') {
+        } else if (action === 'config') {
             // Update game configuration
             const { numberOfBoards, boardSize, difficulty } = data;
             const gameState = gameSessions.get(sessionId);
@@ -163,6 +162,78 @@ export async function POST(request: NextRequest) {
             gameState.gameHistory = [initialBoards];
             gameState.coins = 0;
             gameState.xp = 0;
+
+            gameSessions.set(sessionId, gameState);
+            return NextResponse.json({ success: true, gameState });
+        } else if (action === 'undo') {
+            // Handle undo with coin cost
+            const gameState = gameSessions.get(sessionId);
+
+            if (!gameState) {
+                return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+            }
+
+            if (gameState.gameHistory.length < 3) {
+                return NextResponse.json({ error: 'No moves to undo' }, { status: 400 });
+            }
+
+            // Check if player has enough coins (in a real app, this would check a database)
+            // For now, we'll trust the client check but this should be validated properly
+            gameState.boards = gameState.gameHistory[gameState.gameHistory.length - 3];
+            gameState.gameHistory = gameState.gameHistory.slice(0, -2);
+            gameState.currentPlayer = 1;
+
+            gameSessions.set(sessionId, gameState);
+            return NextResponse.json({ success: true, gameState });
+        } else if (action === 'skip') {
+            // Handle skip with coin cost
+            const gameState = gameSessions.get(sessionId);
+
+            if (!gameState) {
+                return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+            }
+
+            // Check if player has enough coins (in a real app, this would check a database)
+            // For now, we'll trust the client check but this should be validated properly
+
+            // Skip the player's turn - let AI move immediately
+            gameState.currentPlayer = 2;
+
+            // Make AI move
+            const move = findBestMove(
+                gameState.boards,
+                gameState.difficulty,
+                gameState.boardSize,
+                gameState.numberOfBoards
+            );
+
+            if (move) {
+                const aiBoards = updateBoards(gameState.boards, move);
+                gameState.boards = aiBoards;
+                gameState.gameHistory.push(aiBoards);
+
+                // Check for game end after AI move
+                if (aiBoards.every(board => isBoardDead(board, gameState.boardSize))) {
+                    const loser = gameState.currentPlayer;
+                    const winner = loser === 1 ? 2 : 1;
+                    const isHumanWinner = winner === 1;
+                    const rewards = calculateRewards(isHumanWinner, gameState.difficulty,
+                        gameState.numberOfBoards, gameState.boardSize);
+
+                    gameState.winner = winner === 1 ? "You" : "Computer";
+                    gameState.coins = rewards.coins;
+                    gameState.xp = rewards.xp;
+
+                    gameSessions.set(sessionId, gameState);
+                    return NextResponse.json({
+                        success: true,
+                        gameState,
+                        gameOver: true
+                    });
+                }
+
+                gameState.currentPlayer = 1;
+            }
 
             gameSessions.set(sessionId, gameState);
             return NextResponse.json({ success: true, gameState });
