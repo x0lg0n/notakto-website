@@ -7,10 +7,10 @@ import { isBoardDead } from '@/services/logic';
 import { playMoveSound, playWinSound } from '@/services/sounds';
 import { useMute } from '@/services/store';
 import { useRouter } from 'next/navigation';
-import WinnerModal from '../../modals/WinnerModal';
-import BoardConfigModal from '../../modals/BoardConfigModal';
+import WinnerModal from '@/modals/WinnerModal';
+import BoardConfigModal from '@/modals/BoardConfigModal';
 import { useCoins, useXP } from '@/services/store';
-import DifficultyModal from '../../modals/DifficultyModal';
+import DifficultyModal from '@/modals/DifficultyModal';
 import { findBestMove } from '@/services/ai';
 import { calculateRewards } from '@/services/economyUtils';
 import { toast } from "react-toastify";
@@ -24,7 +24,7 @@ const Game = () => {
     const [boards, setBoards] = useState<BoardState[]>([]);
     const [boardSize, setBoardSize] = useState<BoardSize>(3);
     const [gameHistory, setGameHistory] = useState<BoardState[][]>([]);
-    const [currentPlayer, setCurrentPlayer] = useState<1 | 2>(1);
+    const [currentPlayer, setCurrentPlayer] = useState<number>(1);
     const [winner, setWinner] = useState<string>('');
     const [showWinnerModal, setShowWinnerModal] = useState<boolean>(false);
     const [numberOfBoards, setNumberOfBoards] = useState<number>(3);
@@ -85,11 +85,11 @@ const Game = () => {
         setGameHistory([initialBoards]);
         setShowWinnerModal(false);
     };
-    const handleBoardConfigChange = (num: number, size: number) => {
+    const handleBoardConfigChange = (num: number, size: BoardSize) => {
         setNumberOfBoards(Math.min(5, Math.max(1, num)));
-        setBoardSize(size as BoardSize);
+        setBoardSize(size);
         setShowBoardConfig(false);
-        resetGame(num, size as BoardSize);
+        resetGame(num, size);
     };
     const handleUndo = () => {
         if (gameHistory.length >= 3) {
