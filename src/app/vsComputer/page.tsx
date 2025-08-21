@@ -32,7 +32,7 @@ const Game = () => {
     const [showDifficultyModal, setShowDifficultyModal] = useState<boolean>(false);
     const [difficulty, setDifficulty] = useState<DifficultyLevel>(1);
     const [sessionId, setSessionId] = useState<string>('');
-    const [isProcessingMove, setIsProcessingMove] = useState<boolean>(false);
+    const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
     const mute = useMute((state) => state.mute);
     const setMute = useMute((state) => state.setMute);
@@ -86,9 +86,9 @@ const Game = () => {
     };
 
     const makeMove = async (boardIndex: number, cellIndex: number) => {
-        if (isProcessingMove) return;
+        if (isProcessing) return;
 
-        setIsProcessingMove(true);
+        setIsProcessing(true);
         try {
             const response = await fetch('/api/game', {
                 method: 'POST',
@@ -126,21 +126,108 @@ const Game = () => {
         } catch (error) {
             toast.error('Error making move');
         } finally {
-            setIsProcessingMove(false);
+            setIsProcessing(false);
         }
     };
 
     // Reset game by creating a new session on the server
-    const resetGame = (num: number, size: BoardSize, diff: DifficultyLevel = difficulty) => {
-        setShowWinnerModal(false);
-        initGame(num, size, diff);
+    const resetGame = async () => {
+        setIsProcessing(true);
+        try {
+            const response = await fetch('/api/game', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'reset',
+                    sessionId
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Update all game state from server
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setGameHistory(data.gameState.gameHistory);
+                setWinner('');
+                setShowWinnerModal(false);
+            } else {
+                toast.error('Failed to reset game');
+            }
+        } catch (error) {
+            toast.error('Error resetting game');
+        } finally {
+            setIsProcessing(false);
+        }
     };
-    const handleBoardConfigChange = (num: number, size: number) => {
-        const safeNum = Math.min(5, Math.max(1, num));
-        setNumberOfBoards(safeNum);
-        setBoardSize(size as BoardSize);
-        setShowBoardConfig(false);
-        resetGame(safeNum, size as BoardSize, difficulty);
+
+    const handleBoardConfigChange = async (num: number, size: number) => {
+        setIsProcessing(true);
+        try {
+            const response = await fetch('/api/game', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'config',
+                    sessionId,
+                    numberOfBoards: num,
+                    boardSize: size,
+                    difficulty
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Update all game state from server
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setBoardSize(data.gameState.boardSize);
+                setNumberOfBoards(data.gameState.numberOfBoards);
+                setGameHistory(data.gameState.gameHistory);
+                setShowBoardConfig(false);
+            } else {
+                toast.error('Failed to update configuration');
+            }
+        } catch (error) {
+            toast.error('Error updating configuration');
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+    const handleDifficultyChange = async (level: DifficultyLevel) => {
+        setIsProcessing(true);
+        try {
+            const response = await fetch('/api/game', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'config',
+                    sessionId,
+                    numberOfBoards,
+                    boardSize,
+                    difficulty: level
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Update all game state from server
+                setBoards(data.gameState.boards);
+                setCurrentPlayer(data.gameState.currentPlayer);
+                setDifficulty(data.gameState.difficulty);
+                setGameHistory(data.gameState.gameHistory);
+                setShowDifficultyModal(false);
+            } else {
+                toast.error('Failed to update difficulty');
+            }
+        } catch (error) {
+            toast.error('Error updating difficulty');
+        } finally {
+            setIsProcessing(false);
+        }
     };
     const handleUndo = () => {
         if (gameHistory.length >= 3) {
@@ -175,7 +262,6 @@ const Game = () => {
     useEffect(() => {
         // On mount, create a new session
         initGame(numberOfBoards, boardSize, difficulty);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
@@ -213,7 +299,7 @@ const Game = () => {
                 <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999] flex items-center justify-center px-4 overflow-y-auto">
                     <div className="flex flex-wrap justify-center gap-4 max-w-4xl py-8">
                         <button onClick={() => {
-                            resetGame(numberOfBoards, boardSize);
+                            resetGame();
                             setIsMenuOpen(false);
                         }} className="w-full sm:w-[45%] bg-blue-600 py-4 text-white text-[30px]">
                             Reset
@@ -278,7 +364,7 @@ const Game = () => {
                 winner={winner}
                 onPlayAgain={() => {
                     setShowWinnerModal(false);
-                    resetGame(numberOfBoards, boardSize, difficulty);
+                    resetGame();
                 }}
                 onMenu={() => {
                     setShowWinnerModal(false);
@@ -293,10 +379,10 @@ const Game = () => {
             />
             <DifficultyModal
                 visible={showDifficultyModal}
-                onSelect={(level) => {
-                    setDifficulty(level as DifficultyLevel);
+                onSelect={(level: DifficultyLevel) => {
+                    handleDifficultyChange(level);
                     setShowDifficultyModal(false);
-                    resetGame(numberOfBoards, boardSize, level as DifficultyLevel);
+                    resetGame();
                 }}
                 onClose={() => setShowDifficultyModal(false)}
             />

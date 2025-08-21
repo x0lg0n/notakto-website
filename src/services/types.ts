@@ -79,7 +79,7 @@ export type PlayerNamesModalProps = {
 };
 export type DifficultyModalProps = {
   visible: boolean;
-  onSelect: (level: number) => void;
+  onSelect: (level: DifficultyLevel) => void;
   onClose: () => void;
 };
 export type BoardConfigModalProps = {
