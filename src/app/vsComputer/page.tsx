@@ -211,10 +211,9 @@ const Game = () => {
                         <SettingButton
                             onClick={() => handleBuyCoins(setIsProcessingPayment, canShowToast, triggerToastCooldown, setCoins, Coins)}
                             disabled={isProcessingPayment}
-                            className={` flex justify-center items-center gap-2 `}
+                            loading={isProcessingPayment}
                         >
-                            {isProcessingPayment && <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />}
-                            {isProcessingPayment ? 'Processing...' : 'Buy Coins (100)'}
+                            Buy Coins (100)
                         </SettingButton>
                         <SettingButton onClick={() => {
                             setShowDifficultyModal(true);
