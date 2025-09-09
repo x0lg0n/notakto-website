@@ -31,20 +31,29 @@ const Game = () => {
     const [showDifficultyModal, setShowDifficultyModal] = useState<boolean>(false);
     const [difficulty, setDifficulty] = useState<DifficultyLevel>(1);
     const [sessionId, setSessionId] = useState<string>('');
+    
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
+    const [isInitializing, setIsInitializing] = useState(false);
+    const [isResetting, setIsResetting] = useState<boolean>(false);
+    const [isUndoing, setIsUndoing] = useState<boolean>(false);
+    const [isSkipping, setIsSkipping] = useState<boolean>(false);
+    const [isUpdatingConfig, setIsUpdatingConfig] = useState<boolean>(false);
+    const [isUpdatingDifficulty, setIsUpdatingDifficulty] = useState<boolean>(false);
 
     const mute = useMute((state) => state.mute);
     const setMute = useMute((state) => state.setMute);
     const Coins = useCoins((state) => state.coins);
     const setCoins = useCoins((state) => state.setCoins);
     const XP = useXP((state) => state.XP);
-    const setXP = useXP((state) => state.setXP);
     const user = useUser((state) => state.user);
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const { canShowToast, triggerToastCooldown } = useToastCooldown(4000);
     const router = useRouter();
 
     const initGame = async (num: BoardNumber, size: BoardSize, diff: DifficultyLevel) => {
+        if (isInitializing) return;
+        setIsInitializing(true);
+
         try {
             if (user) {
                 const data = await createGame(num, size, diff, await user.getIdToken());
@@ -69,6 +78,8 @@ const Game = () => {
         } catch (error) {
             toast.error('Error initializing game');
             router.push('/');
+        } finally {
+            setIsInitializing(false);
         }
     };
 
@@ -85,8 +96,6 @@ const Game = () => {
                     playMoveSound(mute);
 
                     if (data.gameOver) {
-                        if (data.gameState.coins) setCoins(Coins + data.gameState.coins);
-                        if (data.gameState.xp) setXP(XP + data.gameState.xp);
                         setWinner(data.gameState.winner);
                         setShowWinnerModal(true);
                         playWinSound(mute);
@@ -108,6 +117,9 @@ const Game = () => {
     };
 
     const handleReset = async () => {
+        if (isResetting) return;
+        setIsResetting(true);
+
         try {
             if (user) {
                 const data = await resetGame(sessionId, await user.getIdToken());
@@ -129,14 +141,18 @@ const Game = () => {
             }
         } catch (error) {
             toast.error('Error resetting game');
+        } finally {
+            setIsResetting(false);
         }
     };
 
     const handleUndo = async () => {
-        if (Coins < 100) {
-            toast.error('Not enough coins');
+        if (isUndoing || Coins < 100) {
+            if (Coins < 100) toast.error('Not enough coins');
             return;
         }
+        setIsUndoing(true);
+
         try {
             if (user) {
                 const data = await undoMove(sessionId, await user.getIdToken());
@@ -144,7 +160,6 @@ const Game = () => {
                     setBoards(data.gameState.boards);
                     setCurrentPlayer(data.gameState.currentPlayer);
                     setGameHistory(data.gameState.gameHistory);
-                    setCoins(Coins - 100);
                 } else if ('error' in data) {
                     toast.error(data.error || 'Failed to undo move');
                 } else {
@@ -157,14 +172,18 @@ const Game = () => {
             }
         } catch (error) {
             toast.error('Error undoing move');
+        } finally {
+            setIsUndoing(false);
         }
     };
 
     const handleSkip = async () => {
-        if (Coins < 200) {
-            toast.error('Not enough coins');
+        if (isSkipping || Coins < 200) {
+            if (Coins < 200) toast.error('Not enough coins');
             return;
         }
+        setIsSkipping(true);
+
         try {
             if (user) {
                 const data = await skipMove(sessionId, await user.getIdToken());
@@ -172,7 +191,11 @@ const Game = () => {
                     setBoards(data.gameState.boards);
                     setCurrentPlayer(data.gameState.currentPlayer);
                     setGameHistory(data.gameState.gameHistory);
-                    setCoins(Coins - 200);
+                    if (data.gameOver) {
+                        setWinner(data.gameState.winner);
+                        setShowWinnerModal(true);
+                        playWinSound(mute);
+                    }
                 } else if ('error' in data) {
                     toast.error(data.error || 'Failed to skip move');
                 } else {
@@ -185,10 +208,15 @@ const Game = () => {
             }
         } catch (error) {
             toast.error('Error skipping move');
+        } finally {
+            setIsSkipping(false);
         }
     };
 
     const handleBoardConfigChange = async (newNumberOfBoards: BoardNumber, newBoardSize: BoardSize) => {
+        if (isUpdatingConfig) return;
+        setIsUpdatingConfig(true);
+
         try {
             if (user) {
                 const data = await updateConfig(sessionId, newNumberOfBoards, newBoardSize, difficulty, await user.getIdToken());
@@ -210,10 +238,15 @@ const Game = () => {
             }
         } catch (error) {
             toast.error('Error updating config');
+        } finally {
+            setIsUpdatingConfig(false);
         }
     };
 
     const handleDifficultyChange = async (level: DifficultyLevel) => {
+        if (isUpdatingDifficulty) return;
+        setIsUpdatingDifficulty(true);
+
         try {
             if (user) {
                 const data = await updateConfig(sessionId, numberOfBoards, boardSize, level, await user.getIdToken());
@@ -234,6 +267,8 @@ const Game = () => {
             }
         } catch (error) {
             toast.error('Error updating difficulty');
+        } finally {
+            setIsUpdatingDifficulty(false);
         }
     };
 
@@ -250,8 +285,8 @@ const Game = () => {
                         <span className="text-red-600 text-[35px] "> | XP: {XP}</span>
                     </div>
                     <h2 className="text-red-600 text-[80px] mb-5 text-center">
-  {currentPlayer === 1 ? "Your Turn" : "Computer's Turn"}
-</h2>
+                        {currentPlayer === 1 ? "Your Turn" : "Computer's Turn"}
+                    </h2>
 
                 </div>
 
@@ -277,12 +312,12 @@ const Game = () => {
             {isMenuOpen && (
                 <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999] flex items-center justify-center px-4 overflow-y-auto">
                     <div className="flex flex-wrap justify-center gap-4 max-w-4xl py-8">
-                        <SettingButton onClick={() => { handleReset(); setIsMenuOpen(false); }}>Reset</SettingButton>
-                        <SettingButton onClick={() => { setShowBoardConfig(true); setIsMenuOpen(false); }}>Game Configuration</SettingButton>
-                        <SettingButton onClick={() => { handleUndo(); setIsMenuOpen(false); }} disabled={Coins < 100}>Undo (100 coins)</SettingButton>
-                        <SettingButton onClick={() => { handleSkip(); setIsMenuOpen(false); }} disabled={Coins < 200}>Skip a Move (200 coins)</SettingButton>
+                        <SettingButton onClick={() => { handleReset(); setIsMenuOpen(false); }} disabled={isResetting} loading={isResetting}>Reset</SettingButton>
+                        <SettingButton onClick={() => { setShowBoardConfig(true); setIsMenuOpen(false); }} disabled={isUpdatingConfig}>Game Configuration</SettingButton>
+                        <SettingButton onClick={() => { handleUndo(); setIsMenuOpen(false); }} disabled={Coins < 100 || isUndoing} loading={isUndoing}>Undo (100 coins)</SettingButton>
+                        <SettingButton onClick={() => { handleSkip(); setIsMenuOpen(false); }} disabled={Coins < 200 || isSkipping} loading={isSkipping}>Skip a Move (200 coins)</SettingButton>
                         <SettingButton onClick={() => handleBuyCoins(setIsProcessingPayment, canShowToast, triggerToastCooldown, setCoins, Coins)} disabled={isProcessingPayment} loading={isProcessingPayment}>Buy Coins (100)</SettingButton>
-                        <SettingButton onClick={() => { setShowDifficultyModal(true); setIsMenuOpen(false); }}>AI Level: {difficulty}</SettingButton>
+                        <SettingButton onClick={() => { setShowDifficultyModal(true); setIsMenuOpen(false); }} disabled={isUpdatingDifficulty}>AI Level: {difficulty}</SettingButton>
                         <SettingButton onClick={() => setMute(!mute)}>Sound: {mute ? 'Off' : 'On'}</SettingButton>
                         <SettingButton onClick={() => router.push('/')}>Main Menu</SettingButton>
                         <SettingButton onClick={toggleMenu}>Return to Game</SettingButton>
